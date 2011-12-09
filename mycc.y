@@ -246,13 +246,36 @@ args	: args ',' type ID
 	;
 
 list	: list ',' ID	{ /* TASK 1 and 4: TO BE COMPLETED */
-			 enter(top_tblptr, $$, $3, top_offset);
-			  $$ = $1;
+			if (top_tblptr->level == 0)
+			{
+				cf.fields[cf.field_count].access = ACC_STATIC;			
+				cf.fields[cf.field_count].name = $3->lexptr;		
+				cf.fields[cf.field_count].descriptor = $1;
+			    cf.field_count++;
+				enter(top_tblptr, $1, $3, constant_pool_add_Fieldref(&cf, cf.name, $3->lexptr, $1));
 			}
+			else
+			{
+			  enter(top_tblptr, $1, $3, top_offset);
+			}
+
+		    $$ = $1;
+	 	}
 	| type ID	{ /* TASK 1 and 4: TO BE COMPLETED */
-			 enter(top_tblptr, $2, $1, top_offset++);
-			 $$ = $1;
+            if (top_tblptr->level == 0)
+            {
+                cf.fields[cf.field_count].access = ACC_STATIC;
+                cf.fields[cf.field_count].name = $2->lexptr;
+                cf.fields[cf.field_count].descriptor = $1;
+                cf.field_count++;
+                enter(top_tblptr, $2, $1, constant_pool_add_Fieldref(&cf, cf.name, $2->lexptr, $1));
+            }
+            else
+			{
+			 	enter(top_tblptr, $2, $1, top_offset++);
 			}
+			 $$ = $1;
+		}
 	;
 
 stmts   : stmts stmt
@@ -502,14 +525,18 @@ expr    : ID   '=' expr { int place;
             }
 		  }
 		| ID { int place;
-			   //emit(dup);
-               if (getlevel(top_tblptr, $1) == 1) {
+			   if (getlevel(top_tblptr, $1) == 0)
+			   {
+					emit3( getstatic, getplace(top_tblptr, $1));
+			   }
+               else
+			   {
                		place = getplace(top_tblptr, $1);
                     if (!strcmp(gettype(top_tblptr, $1), "I"))
                     	emit2(iload, place);
 					else if (isfloat(gettype(top_tblptr, $1)))
                         emit2(fload, place);
-				}
+			   }
 		}
         | expr OR  expr { emit(ior); }
         | expr AN  expr { emit(iand); }
@@ -557,7 +584,13 @@ expr    : ID   '=' expr { int place;
 		| STR		{ /* We do not need to implement strings: */
 			  error("string constant not supported");
 			}
-		| ID '(' expr ')'
+		| ID '(' exprs ')'
+			{
+			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
+
+			  //$$.type = mkret(gettype(top_tblptr, $1));
+			}
+		| ID '(' args ')'
 			{ /* TASK 3: TO BE COMPLETED */
 			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
 			  //error("function call not implemented");
