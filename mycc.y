@@ -131,7 +131,45 @@ func	: MAIN '(' ')' Mmain block
 			  enterproc(top_tblptr, $1, type, table);
 			}
 	| type ID '(' Margs args ')' block
-			{ /* TASK 3: TO BE COMPLETED */
+			{  /* TASK 3: TO BE COMPLETED */
+			  Table *table;
+              // the type of function is a JVM type descriptor
+              Type type = mkfun("[Ljava/lang/String;", "V");
+              emit3(getstatic, constant_pool_add_Fieldref(&cf, "java/lang/System", "out", "Ljava/io/PrintStream;"));
+              emit(iload_2);
+              emit3(invokevirtual, constant_pool_add_Methodref(&cf, "java/io/PrintStream", "println", "(I)V"));
+              emit(return_);
+              // method has public access and is static
+              cf.methods[cf.method_count].access = ACC_PUBLIC | ACC_STATIC;
+              // method name is ID
+              cf.methods[cf.method_count].name = $2;
+              cf.methods[cf.method_count].descriptor = $1;
+              cf.methods[cf.method_count].code_length = pc;
+              // must copy code to make it persistent
+              cf.methods[cf.method_count].code = copy_code();
+
+              if (!cf.methods[cf.method_count].code)
+                error("Out of memory");
+
+              cf.methods[cf.method_count].max_stack = 100;
+			  cf.methods[cf.method_count].max_locals = top_offset;
+
+              // advance to next method to store in method array
+              cf.method_count++;
+              if (cf.method_count > MAXFUN)
+                error("Max number of functions exceeded");
+
+              // length of bytecode is in the emitter's pc variable
+              cf.methods[cf.method_count].code_length = pc;
+              // add width information to table
+              table = top_tblptr;
+              addwidth(table, top_offset);
+              // exit the local scope by popping
+              pop_tblptr;
+              pop_offset;
+              // enter the function in the global table
+              enterproc(top_tblptr, $2, type, table);
+
 			}
 	;
 
@@ -173,8 +211,11 @@ Mmain	:		{ int label1, label2;
 			}
 	;
 
+//first
 Margs	:		{ /* TASK 3: TO BE COMPLETED */
-			  // Table *table =
+			  Table *table = mktable(top_tblptr);
+			  push_tblptr(table);
+              push_offset(0);
 			  init_code();
 			  is_in_main = 0;
 			}
@@ -205,10 +246,12 @@ args	: args ',' type ID
 	;
 
 list	: list ',' ID	{ /* TASK 1 and 4: TO BE COMPLETED */
+			 enter(top_tblptr, $$, $3, top_offset);
 			  $$ = $1;
 			}
 	| type ID	{ /* TASK 1 and 4: TO BE COMPLETED */
-			  $$ = $1;
+			 enter(top_tblptr, $2, $1, top_offset++);
+			 $$ = $1;
 			}
 	;
 
@@ -230,15 +273,18 @@ stmt    : ';'
         | DO L stmt WHILE '(' expr M N L ')' ';'
                	  { backpatch($7, $9 - $7); backpatch($8, $2 - $8); }
         | FOR '(' expr  O ';' L expr M N ';' L expr O N ')' L stmt                        
-                           { backpatch($9, $16 - $9);  emit3(goto_,$11-pc); backpatch($8, pc - $8);
-			     backpatch($14, $6 - $14);}
+                           { backpatch($9, $16 - $9);  
+						     emit3(goto_,$11-pc); 
+							 backpatch($8, pc - $8);
+			                 backpatch($14, $6 - $14);
+						   }
         | RETURN expr ';'
                         { if (is_in_main)
 			  				emit(istore_2);
 			  			  else
-			  				error("return int/float not implemented");
+			  				emit(ireturn);
 			}
-	| BREAK ';'	{ /* BREAK is optional to implement */
+		| BREAK ';'	{ /* BREAK is optional to implement */
 			  error("break not implemented");
 			}
         | '{' stmts '}'
@@ -250,17 +296,221 @@ exprs	: exprs ',' expr
 	;
 
 /* TASK 1: TO BE COMPLETED (use pr3 code, then work on assign operators): */
-expr    : ID   '=' expr { emit(dup); emit2(istore, $1->localvar); }
-        | ID   PA  expr { emit2(iload, $1->localvar); emit(iadd); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   NA  expr { emit2(iload, $1->localvar); emit(swap); emit(isub); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   TA  expr { emit2(iload, $1->localvar); emit(imul); emit(dup); emit2(istore, $1->localvar); }
-        | ID   DA  expr { emit2(iload, $1->localvar); emit(swap); emit(idiv); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   MA  expr { emit2(iload, $1->localvar); emit(swap); emit(irem); emit(dup); emit2(istore, $1->localvar); }
-        | ID   AA  expr { emit2(iload, $1->localvar); emit(iand); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   XA  expr { emit2(iload, $1->localvar); emit(swap); emit(ixor); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   OA  expr { emit2(iload, $1->localvar); emit(swap); emit(ior); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   LA  expr { emit2(iload, $1->localvar); emit(swap); emit(ishl); emit(dup); emit2(istore, $1->localvar);  }
-        | ID   RA  expr { emit2(iload, $1->localvar); emit(swap); emit(ishr); emit(dup); emit2(istore, $1->localvar);  }
+expr    : ID   '=' expr { int place;
+							emit(dup);
+							if (getlevel(top_tblptr, $1) == 1) { 
+								place = getplace(top_tblptr, $1);
+								if (isint(gettype(top_tblptr, $1)))
+						  			emit2(istore, place); 
+								else if (isfloat(gettype(top_tblptr, $1)))
+						  			emit2(fstore, place); 
+							}
+						}
+        | ID   PA  expr { 
+
+			int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+
+			emit(iadd); 
+			emit(dup); 
+
+            if (getlevel(top_tblptr, $1) == 1) {
+            	place = getplace(top_tblptr, $1);
+            	if (isint(gettype(top_tblptr, $1)))
+                	emit2(istore, place);
+            	else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   NA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(isub); emit(dup); 
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   TA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(imul); emit(dup); 
+			//emit2(istore, $1->localvar); 
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   DA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(idiv); emit(dup); 
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   MA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(irem); emit(dup); 
+			//emit2(istore, $1->localvar); 
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   AA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(iand); emit(dup); 
+			emit2(istore, $1->localvar);  
+		  }
+        | ID   XA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(ixor); emit(dup); 
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   OA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(ior); emit(dup); 
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   LA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(ishl); emit(dup); 
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+        | ID   RA  expr { 
+			//emit2(iload, $1->localvar); 
+            int place;
+            if (getlevel(top_tblptr, $1) == 1) {
+                 place = getplace(top_tblptr, $1);
+                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                     emit2(iload, place);
+                 else if (isfloat(gettype(top_tblptr, $1)))
+                     emit2(fload, place);
+            }
+			emit(swap); emit(ishr); emit(dup); 
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+		  }
+		| ID { int place;
+			   //emit(dup);
+               if (getlevel(top_tblptr, $1) == 1) {
+               		place = getplace(top_tblptr, $1);
+                    if (!strcmp(gettype(top_tblptr, $1), "I"))
+                    	emit2(iload, place);
+					else if (isfloat(gettype(top_tblptr, $1)))
+                        emit2(fload, place);
+				}
+		}
         | expr OR  expr { emit(ior); }
         | expr AN  expr { emit(iand); }
         | expr '|' expr { emit(ior); }
@@ -303,13 +553,14 @@ expr    : ID   '=' expr { emit(dup); emit2(istore, $1->localvar); }
         | INT8          { emit2(bipush, $1); }
         | INT16         { emit3(sipush, $1); }
         | INT32         { emit2(ldc, constant_pool_add_Integer(&cf, $1)); }
-	| FLT		{ error("float constant not supported"); }
-	| STR		{ /* We do not need to implement strings: */
+		| FLT		{ error("float constant not supported"); }
+		| STR		{ /* We do not need to implement strings: */
 			  error("string constant not supported");
 			}
-	| ID '(' exprs ')'
+		| ID '(' expr ')'
 			{ /* TASK 3: TO BE COMPLETED */
-			  error("function call not implemented");
+			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
+			  //error("function call not implemented");
 			}
         ;
 
