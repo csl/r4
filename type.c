@@ -5,6 +5,7 @@ Type mkfun(Type args, Type result)
   if (!type)
     error("Out of memory");
   sprintf(type, "(%s)%s", args, result);
+  printf("mkfun: %s\n", type);
   return type;
 }
 
