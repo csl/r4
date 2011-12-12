@@ -379,44 +379,49 @@ exprs	: exprs ',' expr
 
 /* TASK 1: TO BE COMPLETED (use pr3 code, then work on assign operators): */
 expr    : ID   '=' expr { 
-				printf("%s = expr, \n", $1->lexptr);
 			    int place = getplace(top_tblptr, $1);
 			    emit(dup);
-			    if (isint(gettype(top_tblptr, $1)))
-			    {
-				//if (isfloat($3.type)
-				//	emit2(f2i); 
-				if (getlevel(top_tblptr, $1) == 0) 
-					emit3(putstatic, place); 
-				else
-					emit2(istore, place); 
-                               }
-			    else if (isfloat(gettype(top_tblptr, $1)))
-			    {
-				//if (isint($3.type))
-				//	emit2(i2f); 
-				if (getlevel(top_tblptr, $1) == 0) 
-					emit3(putstatic, place); 
-				else
+
+				    if (isint(gettype(top_tblptr, $1)))
+				    {
+					//if (isfloat($3.type)
+					//	emit2(f2i); 
+					if (getlevel(top_tblptr, $1) == 0) 
+						emit3(putstatic, place); 
+					else
+						emit2(istore, place); 
+		                      }
+				    else if (isfloat(gettype(top_tblptr, $1)))
+				    {
+					//if (isint($3.type))
+					//	emit2(i2f); 
+					if (getlevel(top_tblptr, $1) == 0) 
+						emit3(putstatic, place); 
+					else
+						emit2(fstore, place); 
+
 					emit2(fstore, place); 
-
-				emit2(fstore, place); 
-			    }
-			   else 
-				error("Type error");
-
+				    }
+				   else 
+					error("Type error");
 			    //$$.type = $3.type;
+
 	 }
         | ID   PA  expr { 
 
-		  int place;
+		  int place = getplace(top_tblptr, $1);
+
             	  if (getlevel(top_tblptr, $1) == 1) {
-                 place = getplace(top_tblptr, $1);
+                 	place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             	   }
+		   else
+		  {
+			emit3(getstatic, place); 
+		  }
 
 			emit(iadd); 
 			emit(dup); 
@@ -428,17 +433,25 @@ expr    : ID   '=' expr {
             	else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
               }
+	    else
+		  {
+			emit3(putstatic, place); 
+		  }
 	 }
         | ID   NA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
-            }
+              }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 			emit(swap); emit(isub); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -448,10 +461,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   TA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -459,6 +476,11 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
+
 			emit(imul); emit(dup); 
 			//emit2(istore, $1->localvar); 
             if (getlevel(top_tblptr, $1) == 1) {
@@ -468,10 +490,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   DA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -479,6 +505,10 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
                 }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 	     emit(swap); emit(idiv); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -488,10 +518,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   MA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -499,6 +533,10 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 			emit(swap); emit(irem); emit(dup); 
 			//emit2(istore, $1->localvar); 
             if (getlevel(top_tblptr, $1) == 1) {
@@ -508,10 +546,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   AA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -519,12 +561,27 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 			emit(iand); emit(dup); 
-			emit2(istore, $1->localvar);  
+			//emit2(istore, $1->localvar);  
+            if (getlevel(top_tblptr, $1) == 1) {
+                place = getplace(top_tblptr, $1);
+                if (isint(gettype(top_tblptr, $1)))
+                    emit2(istore, place);
+                else if (isfloat(gettype(top_tblptr, $1)))
+                    emit2(fstore, place);
+            }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   XA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -532,6 +589,10 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 			emit(swap); emit(ixor); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -541,10 +602,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   OA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -552,6 +617,10 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 			emit(swap); emit(ior); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -561,10 +630,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   LA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -572,6 +645,10 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
             }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
 			emit(swap); emit(ishl); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -581,10 +658,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
             }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
 		  }
         | ID   RA  expr { 
 			//emit2(iload, $1->localvar); 
-            int place;
+            int place = getplace(top_tblptr, $1);
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
                  if (isint(gettype(top_tblptr, $1)))
@@ -592,6 +673,10 @@ expr    : ID   '=' expr {
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
                }
+	    else
+              {
+			emit3(getstatic, place); 
+              }
             emit(swap); emit(ishr); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -601,8 +686,14 @@ expr    : ID   '=' expr {
                 else if (isfloat(gettype(top_tblptr, $1)))
                     emit2(fstore, place);
                 }
+	    else
+              {
+			emit3(putstatic, place); 
+              }
+
            }
-	 | ID { int place;
+	 | ID { 
+		int place;
 
 		if (getlevel(top_tblptr, $1) == 0)
 		{
@@ -610,13 +701,12 @@ expr    : ID   '=' expr {
 		}
                else
 		{
-               		place = getplace(top_tblptr, $1);
-                    		if (isint(gettype(top_tblptr, $1)))
-                    			emit2(iload, place);
-				else if (isfloat(gettype(top_tblptr, $1)))
-                        		emit2(fload, place);
+               	place = getplace(top_tblptr, $1);
+                  	if (isint(gettype(top_tblptr, $1)))
+                    		emit2(iload, place);
+			else if (isfloat(gettype(top_tblptr, $1)))
+                      	emit2(fload, place);
 		}
-		printf("id exit\n");
 	 }
         | expr OR  expr { emit(ior); }
         | expr AN  expr { emit(iand); }

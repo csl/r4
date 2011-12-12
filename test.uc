@@ -2,7 +2,7 @@
 int counter;
 int add(int val)
 {
-	return counter+=val;
+	return counter += val;
 }
 
 main()

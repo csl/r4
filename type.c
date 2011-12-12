@@ -42,24 +42,20 @@ Type mkret(Type type)
 
 int isvoid(Type type)
 { 
-printf("isvoid\n");
 return type && !strcmp(type, "V");
 }
 
 int isint(Type type)
 {
-printf("isint\n");
  return type && !strcmp(type, "I");
 }
 
 int isfloat(Type type)
 { 
-printf("isfloat\n");
 return type && !strcmp(type, "F");
 }
 
 int iseq(Type type1, Type type2)
 { 
-printf("isseq\n");
 return type1 && type2 && !strcmp(type1, type2);
 }
