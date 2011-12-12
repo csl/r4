@@ -1,4053 +1,3943 @@
-Nonterminals useless in grammar
+   0  $accept : prog $end
+
+   1  prog : Mprog exts
+
+   2  Mprog :
+
+   3  else_stmt : ELSE stmt
+
+   4  exts : exts func
+   5       | exts decl
+   6       |
+
+   7  func : MAIN '(' ')' Mmain block
+   8       | type ID '(' Margs args ')' block
+
+   9  Mmain :
+
+  10  Margs :
+
+  11  block : '{' decls stmts '}'
+
+  12  decls : decls decl
+  13        |
+
+  14  decl : list ';'
+
+  15  type : VOID
+  16       | INT
+  17       | FLOAT
+
+  18  args : args ',' type ID
+  19       | type ID
+
+  20  list : list ',' ID
+  21       | type ID
+
+  22  stmts : stmts stmt
+  23        |
+
+  24  stmt : ';'
+  25       | expr ';'
+  26       | IF '(' expr M ')' stmt N L else_stmt L
+  27       | WHILE '(' L expr M ')' stmt N L
+  28       | DO L stmt WHILE '(' expr M N L ')' ';'
+  29       | FOR '(' expr O ';' L expr M N ';' L expr O N ')' L stmt
+  30       | RETURN expr ';'
+  31       | BREAK ';'
+  32       | '{' stmts '}'
+  33       | error ';'
+
+  34  exprs : exprs ',' expr
+  35        | expr
+
+  36  expr : ID '=' expr
+  37       | ID PA expr
+  38       | ID NA expr
+  39       | ID TA expr
+  40       | ID DA expr
+  41       | ID MA expr
+  42       | ID AA expr
+  43       | ID XA expr
+  44       | ID OA expr
+  45       | ID LA expr
+  46       | ID RA expr
+  47       | ID
+  48       | expr OR expr
+  49       | expr AN expr
+  50       | expr '|' expr
+  51       | expr '^' expr
+  52       | expr '&' expr
+  53       | expr EQ expr
+  54       | expr NE expr
+  55       | expr '<' expr
+  56       | expr '>' expr
+  57       | expr LE expr
+  58       | expr GE expr
+  59       | expr LS expr
+  60       | expr RS expr
+  61       | expr '+' expr
+  62       | expr '-' expr
+  63       | expr '*' expr
+  64       | expr '/' expr
+  65       | expr '%' expr
+  66       | expr '%' expr
+  67       | '!' expr
+  68       | '~' expr
+  69       | '+' expr
+  70       | '-' expr
+  71       | '(' expr ')'
+  72       | '$' INT8
+  73       | PP ID
+  74       | NN ID
+  75       | ID PP
+  76       | ID NN
+  77       | INT8
+  78       | INT16
+  79       | INT32
+  80       | FLT
+  81       | STR
+  82       | ID '(' exprs ')'
 
-   K
-   P
+  83  K :
 
+  84  L :
 
-Terminals unused in grammar
+  85  M :
 
-   '.'
-   AR
+  86  N :
 
+  87  P :
 
-Rules useless in grammar
+  88  O :
+
+state 0
+	$accept : . prog $end  (0)
+	Mprog : .  (2)
 
-   89 K: /* 空白 */
+	.  reduce 2
 
-   90 P: /* 空白 */
+	prog  goto 1
+	Mprog  goto 2
 
 
-Rules useless in parser due to conflicts
+state 1
+	$accept : prog . $end  (0)
 
-   66 expr: expr '%' expr
-   77     | ID
+	$end  accept
 
 
-狀態 37 衝突：21 項縮減/縮減
-狀態 150 衝突：21 項縮減/縮減
+state 2
+	prog : Mprog . exts  (1)
+	exts : .  (6)
 
+	.  reduce 6
 
-文法
+	exts  goto 3
 
-    0 $accept: prog $end
 
-    1 prog: Mprog exts
+state 3
+	prog : Mprog exts .  (1)
+	exts : exts . func  (4)
+	exts : exts . decl  (5)
 
-    2 Mprog: /* 空白 */
+	FLOAT  shift 4
+	INT  shift 5
+	MAIN  shift 6
+	VOID  shift 7
+	$end  reduce 1
 
-    3 else_stmt: ELSE stmt
+	type  goto 8
+	list  goto 9
+	func  goto 10
+	decl  goto 11
 
-    4 exts: exts func
-    5     | exts decl
-    6     | /* 空白 */
 
-    7 func: MAIN '(' ')' Mmain block
-    8     | type ID '(' Margs args ')' block
+state 4
+	type : FLOAT .  (17)
 
-    9 Mmain: /* 空白 */
+	.  reduce 17
 
-   10 Margs: /* 空白 */
 
-   11 block: '{' decls stmts '}'
+state 5
+	type : INT .  (16)
 
-   12 decls: decls decl
-   13      | /* 空白 */
+	.  reduce 16
 
-   14 decl: list ';'
 
-   15 type: VOID
-   16     | INT
-   17     | FLOAT
+state 6
+	func : MAIN . '(' ')' Mmain block  (7)
 
-   18 args: args ',' type ID
-   19     | type ID
-
-   20 list: list ',' ID
-   21     | type ID
-
-   22 stmts: stmts stmt
-   23      | /* 空白 */
-
-   24 stmt: ';'
-   25     | expr ';'
-   26     | IF '(' expr M ')' stmt N L else_stmt L
-   27     | WHILE '(' L expr M ')' stmt N L
-   28     | DO L stmt WHILE '(' expr M N L ')' ';'
-   29     | FOR '(' expr O ';' L expr M N ';' L expr O N ')' L stmt
-   30     | RETURN expr ';'
-   31     | BREAK ';'
-   32     | '{' stmts '}'
-   33     | error ';'
-
-   34 exprs: exprs ',' expr
-   35      | expr
-
-   36 expr: ID '=' expr
-   37     | ID PA expr
-   38     | ID NA expr
-   39     | ID TA expr
-   40     | ID DA expr
-   41     | ID MA expr
-   42     | ID AA expr
-   43     | ID XA expr
-   44     | ID OA expr
-   45     | ID LA expr
-   46     | ID RA expr
-   47     | ID
-   48     | expr OR expr
-   49     | expr AN expr
-   50     | expr '|' expr
-   51     | expr '^' expr
-   52     | expr '&' expr
-   53     | expr EQ expr
-   54     | expr NE expr
-   55     | expr '<' expr
-   56     | expr '>' expr
-   57     | expr LE expr
-   58     | expr GE expr
-   59     | expr LS expr
-   60     | expr RS expr
-   61     | expr '+' expr
-   62     | expr '-' expr
-   63     | expr '*' expr
-   64     | expr '/' expr
-   65     | expr '%' expr
-   66     | expr '%' expr
-   67     | '!' expr
-   68     | '~' expr
-   69     | '+' expr
-   70     | '-' expr
-   71     | '(' expr ')'
-   72     | '$' INT8
-   73     | PP ID
-   74     | NN ID
-   75     | ID PP
-   76     | ID NN
-   77     | ID
-   78     | INT8
-   79     | INT16
-   80     | INT32
-   81     | FLT
-   82     | STR
-   83     | ID '(' exprs ')'
-   84     | ID '(' args ')'
-
-   85 L: /* 空白 */
-
-   86 M: /* 空白 */
-
-   87 N: /* 空白 */
-
-   88 O: /* 空白 */
-
-
-終結語詞，附有它們出現處的規則
-
-$end (0) 0
-'!' (33) 67
-'$' (36) 72
-'%' (37) 65 66
-'&' (38) 52
-'(' (40) 7 8 26 27 28 29 71 83 84
-')' (41) 7 8 26 27 28 29 71 83 84
-'*' (42) 63
-'+' (43) 61 69
-',' (44) 18 20 34
-'-' (45) 62 70
-'.' (46)
-'/' (47) 64
-';' (59) 14 24 25 28 29 30 31 33
-'<' (60) 55
-'=' (61) 36
-'>' (62) 56
-'^' (94) 51
-'{' (123) 11 32
-'|' (124) 50
-'}' (125) 11 32
-'~' (126) 68
-error (256) 33
-ID (258) 8 18 19 20 21 36 37 38 39 40 41 42 43 44 45 46 47 73 74 75
-    76 77 83 84
-INT8 (259) 72 78
-INT16 (260) 79
-INT32 (261) 80
-FLT (262) 81
-STR (263) 82
-DO (264) 28
-ELSE (265) 3
-FLOAT (266) 17
-FOR (267) 29
-IF (268) 26
-INT (269) 16
-MAIN (270) 7
-RETURN (271) 30
-VOID (272) 15
-WHILE (273) 27 28
-BREAK (274) 31
-RA (275) 46
-LA (276) 45
-OA (277) 44
-XA (278) 43
-AA (279) 42
-MA (280) 41
-DA (281) 40
-TA (282) 39
-NA (283) 38
-PA (284) 37
-OR (285) 48
-AN (286) 49
-GE (287) 58
-LE (288) 57
-NE (289) 54
-EQ (290) 53
-RS (291) 60
-LS (292) 59
-NN (293) 74 76
-PP (294) 73 75
-AR (295)
-
-
-非終結語詞，附有它們出現處的規則
-
-$accept (62)
-    於左側： 0
-prog (63)
-    於左側： 1, 於右側： 0
-Mprog (64)
-    於左側： 2, 於右側： 1
-else_stmt (65)
-    於左側： 3, 於右側： 26
-exts (66)
-    於左側： 4 5 6, 於右側： 1 4 5
-func (67)
-    於左側： 7 8, 於右側： 4
-Mmain (68)
-    於左側： 9, 於右側： 7
-Margs (69)
-    於左側： 10, 於右側： 8
-block (70)
-    於左側： 11, 於右側： 7 8
-decls (71)
-    於左側： 12 13, 於右側： 11 12
-decl (72)
-    於左側： 14, 於右側： 5 12
-type (73)
-    於左側： 15 16 17, 於右側： 8 18 19 21
-args (74)
-    於左側： 18 19, 於右側： 8 18 84
-list (75)
-    於左側： 20 21, 於右側： 14 20
-stmts (76)
-    於左側： 22 23, 於右側： 11 22 32
-stmt (77)
-    於左側： 24 25 26 27 28 29 30 31 32 33, 於右側： 3 22 26
-    27 28 29
-exprs (78)
-    於左側： 34 35, 於右側： 34 83
-expr (79)
-    於左側： 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52
-    53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73
-    74 75 76 77 78 79 80 81 82 83 84, 於右側： 25 26 27 28 29 30
-    34 35 36 37 38 39 40 41 42 43 44 45 46 48 49 50 51 52 53 54 55
-    56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71
-L (80)
-    於左側： 85, 於右側： 26 27 28 29
-M (81)
-    於左側： 86, 於右側： 26 27 28 29
-N (82)
-    於左側： 87, 於右側： 26 27 28 29
-O (83)
-    於左側： 88, 於右側： 29
-
-
-狀態 0
-
-    0 $accept: . prog $end
-
-    $預設  使用規則 2 以縮減 (Mprog)
-
-    prog   進入狀態 1
-    Mprog  進入狀態 2
-
-
-狀態 1
-
-    0 $accept: prog . $end
+	'('  shift 12
+	.  error
 
-    $end  偏移，並進入狀態 3
 
+state 7
+	type : VOID .  (15)
 
-狀態 2
+	.  reduce 15
 
-    1 prog: Mprog . exts
 
-    $預設  使用規則 6 以縮減 (exts)
+state 8
+	func : type . ID '(' Margs args ')' block  (8)
+	list : type . ID  (21)
 
-    exts  進入狀態 4
+	ID  shift 13
+	.  error
 
 
-狀態 3
+state 9
+	decl : list . ';'  (14)
+	list : list . ',' ID  (20)
 
-    0 $accept: prog $end .
+	';'  shift 14
+	','  shift 15
+	.  error
 
-    $預設  接受
 
+state 10
+	exts : exts func .  (4)
 
-狀態 4
+	.  reduce 4
 
-    1 prog: Mprog exts .
-    4 exts: exts . func
-    5     | exts . decl
 
-    FLOAT  偏移，並進入狀態 5
-    INT    偏移，並進入狀態 6
-    MAIN   偏移，並進入狀態 7
-    VOID   偏移，並進入狀態 8
+state 11
+	exts : exts decl .  (5)
 
-    $預設  使用規則 1 以縮減 (prog)
+	.  reduce 5
 
-    func  進入狀態 9
-    decl  進入狀態 10
-    type  進入狀態 11
-    list  進入狀態 12
 
+state 12
+	func : MAIN '(' . ')' Mmain block  (7)
 
-狀態 5
+	')'  shift 16
+	.  error
 
-   17 type: FLOAT .
 
-    $預設  使用規則 17 以縮減 (type)
+state 13
+	func : type ID . '(' Margs args ')' block  (8)
+	list : type ID .  (21)
 
+	'('  shift 17
+	';'  reduce 21
+	','  reduce 21
 
-狀態 6
 
-   16 type: INT .
+state 14
+	decl : list ';' .  (14)
 
-    $預設  使用規則 16 以縮減 (type)
+	.  reduce 14
 
 
-狀態 7
+state 15
+	list : list ',' . ID  (20)
 
-    7 func: MAIN . '(' ')' Mmain block
+	ID  shift 18
+	.  error
 
-    '('  偏移，並進入狀態 13
 
+state 16
+	func : MAIN '(' ')' . Mmain block  (7)
+	Mmain : .  (9)
 
-狀態 8
+	.  reduce 9
 
-   15 type: VOID .
+	Mmain  goto 19
 
-    $預設  使用規則 15 以縮減 (type)
 
+state 17
+	func : type ID '(' . Margs args ')' block  (8)
+	Margs : .  (10)
 
-狀態 9
+	.  reduce 10
 
-    4 exts: exts func .
+	Margs  goto 20
 
-    $預設  使用規則 4 以縮減 (exts)
 
+state 18
+	list : list ',' ID .  (20)
 
-狀態 10
+	.  reduce 20
 
-    5 exts: exts decl .
 
-    $預設  使用規則 5 以縮減 (exts)
+state 19
+	func : MAIN '(' ')' Mmain . block  (7)
 
+	'{'  shift 21
+	.  error
 
-狀態 11
+	block  goto 22
 
-    8 func: type . ID '(' Margs args ')' block
-   21 list: type . ID
 
-    ID  偏移，並進入狀態 14
+state 20
+	func : type ID '(' Margs . args ')' block  (8)
 
+	FLOAT  shift 4
+	INT  shift 5
+	VOID  shift 7
+	.  error
 
-狀態 12
+	type  goto 23
+	args  goto 24
 
-   14 decl: list . ';'
-   20 list: list . ',' ID
 
-    ';'  偏移，並進入狀態 15
-    ','  偏移，並進入狀態 16
+state 21
+	block : '{' . decls stmts '}'  (11)
+	decls : .  (13)
 
+	.  reduce 13
 
-狀態 13
+	decls  goto 25
 
-    7 func: MAIN '(' . ')' Mmain block
 
-    ')'  偏移，並進入狀態 17
+state 22
+	func : MAIN '(' ')' Mmain block .  (7)
 
+	.  reduce 7
 
-狀態 14
 
-    8 func: type ID . '(' Margs args ')' block
-   21 list: type ID .
+state 23
+	args : type . ID  (19)
 
-    '('  偏移，並進入狀態 18
+	ID  shift 26
+	.  error
 
-    $預設  使用規則 21 以縮減 (list)
 
+state 24
+	func : type ID '(' Margs args . ')' block  (8)
+	args : args . ',' type ID  (18)
 
-狀態 15
+	')'  shift 27
+	','  shift 28
+	.  error
 
-   14 decl: list ';' .
 
-    $預設  使用規則 14 以縮減 (decl)
+state 25
+	block : '{' decls . stmts '}'  (11)
+	decls : decls . decl  (12)
+	stmts : .  (23)
 
+	FLOAT  shift 4
+	INT  shift 5
+	VOID  shift 7
+	error  reduce 23
+	ID  reduce 23
+	INT8  reduce 23
+	INT16  reduce 23
+	INT32  reduce 23
+	FLT  reduce 23
+	STR  reduce 23
+	DO  reduce 23
+	FOR  reduce 23
+	IF  reduce 23
+	RETURN  reduce 23
+	WHILE  reduce 23
+	BREAK  reduce 23
+	'+'  reduce 23
+	'-'  reduce 23
+	'!'  reduce 23
+	'~'  reduce 23
+	PP  reduce 23
+	NN  reduce 23
+	'('  reduce 23
+	'{'  reduce 23
+	'}'  reduce 23
+	';'  reduce 23
+	'$'  reduce 23
 
-狀態 16
+	type  goto 29
+	list  goto 9
+	decl  goto 30
+	stmts  goto 31
 
-   20 list: list ',' . ID
 
-    ID  偏移，並進入狀態 19
+state 26
+	args : type ID .  (19)
 
+	.  reduce 19
 
-狀態 17
 
-    7 func: MAIN '(' ')' . Mmain block
+state 27
+	func : type ID '(' Margs args ')' . block  (8)
 
-    $預設  使用規則 9 以縮減 (Mmain)
+	'{'  shift 21
+	.  error
 
-    Mmain  進入狀態 20
+	block  goto 32
 
 
-狀態 18
+state 28
+	args : args ',' . type ID  (18)
 
-    8 func: type ID '(' . Margs args ')' block
+	FLOAT  shift 4
+	INT  shift 5
+	VOID  shift 7
+	.  error
 
-    $預設  使用規則 10 以縮減 (Margs)
+	type  goto 33
 
-    Margs  進入狀態 21
 
+state 29
+	list : type . ID  (21)
 
-狀態 19
+	ID  shift 34
+	.  error
 
-   20 list: list ',' ID .
 
-    $預設  使用規則 20 以縮減 (list)
+state 30
+	decls : decls decl .  (12)
 
+	.  reduce 12
 
-狀態 20
 
-    7 func: MAIN '(' ')' Mmain . block
+state 31
+	block : '{' decls stmts . '}'  (11)
+	stmts : stmts . stmt  (22)
 
-    '{'  偏移，並進入狀態 22
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	'}'  shift 56
+	';'  shift 57
+	'$'  shift 58
+	.  error
 
-    block  進入狀態 23
+	stmt  goto 59
+	expr  goto 60
 
 
-狀態 21
+state 32
+	func : type ID '(' Margs args ')' block .  (8)
 
-    8 func: type ID '(' Margs . args ')' block
+	.  reduce 8
 
-    FLOAT  偏移，並進入狀態 5
-    INT    偏移，並進入狀態 6
-    VOID   偏移，並進入狀態 8
 
-    type  進入狀態 24
-    args  進入狀態 25
+state 33
+	args : args ',' type . ID  (18)
 
+	ID  shift 61
+	.  error
 
-狀態 22
 
-   11 block: '{' . decls stmts '}'
+state 34
+	list : type ID .  (21)
 
-    $預設  使用規則 13 以縮減 (decls)
+	.  reduce 21
 
-    decls  進入狀態 26
 
+state 35
+	stmt : error . ';'  (33)
 
-狀態 23
+	';'  shift 62
+	.  error
 
-    7 func: MAIN '(' ')' Mmain block .
 
-    $預設  使用規則 7 以縮減 (func)
+state 36
+	expr : ID . '=' expr  (36)
+	expr : ID . PA expr  (37)
+	expr : ID . NA expr  (38)
+	expr : ID . TA expr  (39)
+	expr : ID . DA expr  (40)
+	expr : ID . MA expr  (41)
+	expr : ID . AA expr  (42)
+	expr : ID . XA expr  (43)
+	expr : ID . OA expr  (44)
+	expr : ID . LA expr  (45)
+	expr : ID . RA expr  (46)
+	expr : ID .  (47)
+	expr : ID . PP  (75)
+	expr : ID . NN  (76)
+	expr : ID . '(' exprs ')'  (82)
 
+	'='  shift 63
+	PA  shift 64
+	NA  shift 65
+	TA  shift 66
+	DA  shift 67
+	MA  shift 68
+	AA  shift 69
+	XA  shift 70
+	OA  shift 71
+	LA  shift 72
+	RA  shift 73
+	PP  shift 74
+	NN  shift 75
+	'('  shift 76
+	OR  reduce 47
+	AN  reduce 47
+	'|'  reduce 47
+	'^'  reduce 47
+	'&'  reduce 47
+	EQ  reduce 47
+	NE  reduce 47
+	LE  reduce 47
+	'<'  reduce 47
+	GE  reduce 47
+	'>'  reduce 47
+	LS  reduce 47
+	RS  reduce 47
+	'+'  reduce 47
+	'-'  reduce 47
+	'*'  reduce 47
+	'/'  reduce 47
+	'%'  reduce 47
+	')'  reduce 47
+	';'  reduce 47
+	','  reduce 47
 
-狀態 24
 
-   19 args: type . ID
+state 37
+	expr : INT8 .  (77)
 
-    ID  偏移，並進入狀態 27
+	.  reduce 77
 
 
-狀態 25
+state 38
+	expr : INT16 .  (78)
 
-    8 func: type ID '(' Margs args . ')' block
-   18 args: args . ',' type ID
+	.  reduce 78
 
-    ')'  偏移，並進入狀態 28
-    ','  偏移，並進入狀態 29
 
+state 39
+	expr : INT32 .  (79)
 
-狀態 26
+	.  reduce 79
 
-   11 block: '{' decls . stmts '}'
-   12 decls: decls . decl
 
-    FLOAT  偏移，並進入狀態 5
-    INT    偏移，並進入狀態 6
-    VOID   偏移，並進入狀態 8
+state 40
+	expr : FLT .  (80)
 
-    $預設  使用規則 23 以縮減 (stmts)
+	.  reduce 80
 
-    decl   進入狀態 30
-    type   進入狀態 31
-    list   進入狀態 12
-    stmts  進入狀態 32
 
+state 41
+	expr : STR .  (81)
 
-狀態 27
+	.  reduce 81
 
-   19 args: type ID .
 
-    $預設  使用規則 19 以縮減 (args)
+state 42
+	stmt : DO . L stmt WHILE '(' expr M N L ')' ';'  (28)
+	L : .  (84)
 
+	.  reduce 84
 
-狀態 28
+	L  goto 77
 
-    8 func: type ID '(' Margs args ')' . block
 
-    '{'  偏移，並進入狀態 22
+state 43
+	stmt : FOR . '(' expr O ';' L expr M N ';' L expr O N ')' L stmt  (29)
 
-    block  進入狀態 33
+	'('  shift 78
+	.  error
 
 
-狀態 29
+state 44
+	stmt : IF . '(' expr M ')' stmt N L else_stmt L  (26)
 
-   18 args: args ',' . type ID
+	'('  shift 79
+	.  error
 
-    FLOAT  偏移，並進入狀態 5
-    INT    偏移，並進入狀態 6
-    VOID   偏移，並進入狀態 8
 
-    type  進入狀態 34
+state 45
+	stmt : RETURN . expr ';'  (30)
 
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-狀態 30
+	expr  goto 80
 
-   12 decls: decls decl .
 
-    $預設  使用規則 12 以縮減 (decls)
+state 46
+	stmt : WHILE . '(' L expr M ')' stmt N L  (27)
 
+	'('  shift 81
+	.  error
 
-狀態 31
 
-   21 list: type . ID
+state 47
+	stmt : BREAK . ';'  (31)
 
-    ID  偏移，並進入狀態 35
+	';'  shift 82
+	.  error
 
 
-狀態 32
+state 48
+	expr : '+' . expr  (69)
 
-   11 block: '{' decls stmts . '}'
-   22 stmts: stmts . stmt
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    '}'     偏移，並進入狀態 57
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
+	expr  goto 83
 
-    stmt  進入狀態 60
-    expr  進入狀態 61
 
+state 49
+	expr : '-' . expr  (70)
 
-狀態 33
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    8 func: type ID '(' Margs args ')' block .
+	expr  goto 84
 
-    $預設  使用規則 8 以縮減 (func)
 
+state 50
+	expr : '!' . expr  (67)
 
-狀態 34
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   18 args: args ',' type . ID
+	expr  goto 85
 
-    ID  偏移，並進入狀態 62
 
+state 51
+	expr : '~' . expr  (68)
 
-狀態 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   21 list: type ID .
+	expr  goto 86
 
-    $預設  使用規則 21 以縮減 (list)
 
+state 52
+	expr : PP . ID  (73)
 
-狀態 36
+	ID  shift 87
+	.  error
 
-   33 stmt: error . ';'
 
-    ';'  偏移，並進入狀態 63
+state 53
+	expr : NN . ID  (74)
 
+	ID  shift 88
+	.  error
 
-狀態 37
 
-   36 expr: ID . '=' expr
-   37     | ID . PA expr
-   38     | ID . NA expr
-   39     | ID . TA expr
-   40     | ID . DA expr
-   41     | ID . MA expr
-   42     | ID . AA expr
-   43     | ID . XA expr
-   44     | ID . OA expr
-   45     | ID . LA expr
-   46     | ID . RA expr
-   47     | ID .
-   75     | ID . PP
-   76     | ID . NN
-   77     | ID .
-   83     | ID . '(' exprs ')'
-   84     | ID . '(' args ')'
+state 54
+	expr : '(' . expr ')'  (71)
 
-    '='  偏移，並進入狀態 64
-    RA   偏移，並進入狀態 65
-    LA   偏移，並進入狀態 66
-    OA   偏移，並進入狀態 67
-    XA   偏移，並進入狀態 68
-    AA   偏移，並進入狀態 69
-    MA   偏移，並進入狀態 70
-    DA   偏移，並進入狀態 71
-    TA   偏移，並進入狀態 72
-    NA   偏移，並進入狀態 73
-    PA   偏移，並進入狀態 74
-    NN   偏移，並進入狀態 75
-    PP   偏移，並進入狀態 76
-    '('  偏移，並進入狀態 77
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    OR       使用規則 47 以縮減 (expr)
-    OR       [使用規則 77 以縮減 (expr)]
-    AN       使用規則 47 以縮減 (expr)
-    AN       [使用規則 77 以縮減 (expr)]
-    '|'      使用規則 47 以縮減 (expr)
-    '|'      [使用規則 77 以縮減 (expr)]
-    '^'      使用規則 47 以縮減 (expr)
-    '^'      [使用規則 77 以縮減 (expr)]
-    '&'      使用規則 47 以縮減 (expr)
-    '&'      [使用規則 77 以縮減 (expr)]
-    '<'      使用規則 47 以縮減 (expr)
-    '<'      [使用規則 77 以縮減 (expr)]
-    '>'      使用規則 47 以縮減 (expr)
-    '>'      [使用規則 77 以縮減 (expr)]
-    GE       使用規則 47 以縮減 (expr)
-    GE       [使用規則 77 以縮減 (expr)]
-    LE       使用規則 47 以縮減 (expr)
-    LE       [使用規則 77 以縮減 (expr)]
-    NE       使用規則 47 以縮減 (expr)
-    NE       [使用規則 77 以縮減 (expr)]
-    EQ       使用規則 47 以縮減 (expr)
-    EQ       [使用規則 77 以縮減 (expr)]
-    RS       使用規則 47 以縮減 (expr)
-    RS       [使用規則 77 以縮減 (expr)]
-    LS       使用規則 47 以縮減 (expr)
-    LS       [使用規則 77 以縮減 (expr)]
-    '+'      使用規則 47 以縮減 (expr)
-    '+'      [使用規則 77 以縮減 (expr)]
-    '-'      使用規則 47 以縮減 (expr)
-    '-'      [使用規則 77 以縮減 (expr)]
-    '*'      使用規則 47 以縮減 (expr)
-    '*'      [使用規則 77 以縮減 (expr)]
-    '/'      使用規則 47 以縮減 (expr)
-    '/'      [使用規則 77 以縮減 (expr)]
-    '%'      使用規則 47 以縮減 (expr)
-    '%'      [使用規則 77 以縮減 (expr)]
-    ')'      使用規則 47 以縮減 (expr)
-    ')'      [使用規則 77 以縮減 (expr)]
-    ';'      使用規則 47 以縮減 (expr)
-    ';'      [使用規則 77 以縮減 (expr)]
-    ','      使用規則 47 以縮減 (expr)
-    ','      [使用規則 77 以縮減 (expr)]
-    $預設  使用規則 47 以縮減 (expr)
+	expr  goto 89
 
 
-狀態 38
+state 55
+	stmt : '{' . stmts '}'  (32)
+	stmts : .  (23)
 
-   78 expr: INT8 .
+	.  reduce 23
 
-    $預設  使用規則 78 以縮減 (expr)
+	stmts  goto 90
 
 
-狀態 39
+state 56
+	block : '{' decls stmts '}' .  (11)
 
-   79 expr: INT16 .
+	.  reduce 11
 
-    $預設  使用規則 79 以縮減 (expr)
 
+state 57
+	stmt : ';' .  (24)
 
-狀態 40
+	.  reduce 24
 
-   80 expr: INT32 .
 
-    $預設  使用規則 80 以縮減 (expr)
+state 58
+	expr : '$' . INT8  (72)
 
+	INT8  shift 91
+	.  error
 
-狀態 41
 
-   81 expr: FLT .
+state 59
+	stmts : stmts stmt .  (22)
 
-    $預設  使用規則 81 以縮減 (expr)
+	.  reduce 22
 
 
-狀態 42
+state 60
+	stmt : expr . ';'  (25)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
 
-   82 expr: STR .
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	';'  shift 110
+	.  error
 
-    $預設  使用規則 82 以縮減 (expr)
 
+state 61
+	args : args ',' type ID .  (18)
 
-狀態 43
+	.  reduce 18
 
-   28 stmt: DO . L stmt WHILE '(' expr M N L ')' ';'
 
-    $預設  使用規則 85 以縮減 (L)
+state 62
+	stmt : error ';' .  (33)
 
-    L  進入狀態 78
+	.  reduce 33
 
 
-狀態 44
+state 63
+	expr : ID '=' . expr  (36)
 
-   29 stmt: FOR . '(' expr O ';' L expr M N ';' L expr O N ')' L stmt
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    '('  偏移，並進入狀態 79
+	expr  goto 111
 
 
-狀態 45
+state 64
+	expr : ID PA . expr  (37)
 
-   26 stmt: IF . '(' expr M ')' stmt N L else_stmt L
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    '('  偏移，並進入狀態 80
+	expr  goto 112
 
 
-狀態 46
+state 65
+	expr : ID NA . expr  (38)
 
-   30 stmt: RETURN . expr ';'
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
+	expr  goto 113
 
-    expr  進入狀態 81
 
+state 66
+	expr : ID TA . expr  (39)
 
-狀態 47
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   27 stmt: WHILE . '(' L expr M ')' stmt N L
+	expr  goto 114
 
-    '('  偏移，並進入狀態 82
 
+state 67
+	expr : ID DA . expr  (40)
 
-狀態 48
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   31 stmt: BREAK . ';'
+	expr  goto 115
 
-    ';'  偏移，並進入狀態 83
 
+state 68
+	expr : ID MA . expr  (41)
 
-狀態 49
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   69 expr: '+' . expr
+	expr  goto 116
 
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
 
-    expr  進入狀態 84
+state 69
+	expr : ID AA . expr  (42)
 
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-狀態 50
+	expr  goto 117
 
-   70 expr: '-' . expr
 
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
+state 70
+	expr : ID XA . expr  (43)
 
-    expr  進入狀態 85
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
+	expr  goto 118
 
-狀態 51
 
-   67 expr: '!' . expr
+state 71
+	expr : ID OA . expr  (44)
 
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    expr  進入狀態 86
+	expr  goto 119
 
 
-狀態 52
+state 72
+	expr : ID LA . expr  (45)
 
-   68 expr: '~' . expr
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
+	expr  goto 120
 
-    expr  進入狀態 87
 
+state 73
+	expr : ID RA . expr  (46)
 
-狀態 53
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   74 expr: NN . ID
+	expr  goto 121
 
-    ID  偏移，並進入狀態 88
 
+state 74
+	expr : ID PP .  (75)
 
-狀態 54
+	.  reduce 75
 
-   73 expr: PP . ID
 
-    ID  偏移，並進入狀態 89
+state 75
+	expr : ID NN .  (76)
 
+	.  reduce 76
 
-狀態 55
 
-   71 expr: '(' . expr ')'
+state 76
+	expr : ID '(' . exprs ')'  (82)
 
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-    expr  進入狀態 90
+	expr  goto 122
+	exprs  goto 123
 
 
-狀態 56
+state 77
+	stmt : DO L . stmt WHILE '(' expr M N L ')' ';'  (28)
 
-   32 stmt: '{' . stmts '}'
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	';'  shift 57
+	'$'  shift 58
+	.  error
 
-    $預設  使用規則 23 以縮減 (stmts)
+	stmt  goto 124
+	expr  goto 60
 
-    stmts  進入狀態 91
 
+state 78
+	stmt : FOR '(' . expr O ';' L expr M N ';' L expr O N ')' L stmt  (29)
 
-狀態 57
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   11 block: '{' decls stmts '}' .
+	expr  goto 125
 
-    $預設  使用規則 11 以縮減 (block)
 
+state 79
+	stmt : IF '(' . expr M ')' stmt N L else_stmt L  (26)
 
-狀態 58
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
 
-   24 stmt: ';' .
+	expr  goto 126
 
-    $預設  使用規則 24 以縮減 (stmt)
 
+state 80
+	stmt : RETURN expr . ';'  (30)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
 
-狀態 59
-
-   72 expr: '$' . INT8
-
-    INT8  偏移，並進入狀態 92
-
-
-狀態 60
-
-   22 stmts: stmts stmt .
-
-    $預設  使用規則 22 以縮減 (stmts)
-
-
-狀態 61
-
-   25 stmt: expr . ';'
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-    ';'  偏移，並進入狀態 111
-
-
-狀態 62
-
-   18 args: args ',' type ID .
-
-    $預設  使用規則 18 以縮減 (args)
-
-
-狀態 63
-
-   33 stmt: error ';' .
-
-    $預設  使用規則 33 以縮減 (stmt)
-
-
-狀態 64
-
-   36 expr: ID '=' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 112
-
-
-狀態 65
-
-   46 expr: ID RA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 113
-
-
-狀態 66
-
-   45 expr: ID LA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 114
-
-
-狀態 67
-
-   44 expr: ID OA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 115
-
-
-狀態 68
-
-   43 expr: ID XA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 116
-
-
-狀態 69
-
-   42 expr: ID AA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 117
-
-
-狀態 70
-
-   41 expr: ID MA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 118
-
-
-狀態 71
-
-   40 expr: ID DA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 119
-
-
-狀態 72
-
-   39 expr: ID TA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 120
-
-
-狀態 73
-
-   38 expr: ID NA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 121
-
-
-狀態 74
-
-   37 expr: ID PA . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 122
-
-
-狀態 75
-
-   76 expr: ID NN .
-
-    $預設  使用規則 76 以縮減 (expr)
-
-
-狀態 76
-
-   75 expr: ID PP .
-
-    $預設  使用規則 75 以縮減 (expr)
-
-
-狀態 77
-
-   83 expr: ID '(' . exprs ')'
-   84     | ID '(' . args ')'
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    FLOAT  偏移，並進入狀態 5
-    INT    偏移，並進入狀態 6
-    VOID   偏移，並進入狀態 8
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    type   進入狀態 24
-    args   進入狀態 123
-    exprs  進入狀態 124
-    expr   進入狀態 125
-
-
-狀態 78
-
-   28 stmt: DO L . stmt WHILE '(' expr M N L ')' ';'
-
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
-
-    stmt  進入狀態 126
-    expr  進入狀態 61
-
-
-狀態 79
-
-   29 stmt: FOR '(' . expr O ';' L expr M N ';' L expr O N ')' L stmt
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 127
-
-
-狀態 80
-
-   26 stmt: IF '(' . expr M ')' stmt N L else_stmt L
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 128
-
-
-狀態 81
-
-   30 stmt: RETURN expr . ';'
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-    ';'  偏移，並進入狀態 129
-
-
-狀態 82
-
-   27 stmt: WHILE '(' . L expr M ')' stmt N L
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 130
-
-
-狀態 83
-
-   31 stmt: BREAK ';' .
-
-    $預設  使用規則 31 以縮減 (stmt)
-
-
-狀態 84
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-   69     | '+' expr .
-
-    $預設  使用規則 69 以縮減 (expr)
-
-
-狀態 85
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-   70     | '-' expr .
-
-    $預設  使用規則 70 以縮減 (expr)
-
-
-狀態 86
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-   67     | '!' expr .
-
-    $預設  使用規則 67 以縮減 (expr)
-
-
-狀態 87
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-   68     | '~' expr .
-
-    $預設  使用規則 68 以縮減 (expr)
-
-
-狀態 88
-
-   74 expr: NN ID .
-
-    $預設  使用規則 74 以縮減 (expr)
-
-
-狀態 89
-
-   73 expr: PP ID .
-
-    $預設  使用規則 73 以縮減 (expr)
-
-
-狀態 90
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-   71     | '(' expr . ')'
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-    ')'  偏移，並進入狀態 131
-
-
-狀態 91
-
-   22 stmts: stmts . stmt
-   32 stmt: '{' stmts . '}'
-
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    '}'     偏移，並進入狀態 132
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
-
-    stmt  進入狀態 60
-    expr  進入狀態 61
-
-
-狀態 92
-
-   72 expr: '$' INT8 .
-
-    $預設  使用規則 72 以縮減 (expr)
-
-
-狀態 93
-
-   48 expr: expr OR . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 133
-
-
-狀態 94
-
-   49 expr: expr AN . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 134
-
-
-狀態 95
-
-   50 expr: expr '|' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 135
-
-
-狀態 96
-
-   51 expr: expr '^' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 136
-
-
-狀態 97
-
-   52 expr: expr '&' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 137
-
-
-狀態 98
-
-   55 expr: expr '<' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 138
-
-
-狀態 99
-
-   56 expr: expr '>' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 139
-
-
-狀態 100
-
-   58 expr: expr GE . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 140
-
-
-狀態 101
-
-   57 expr: expr LE . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 141
-
-
-狀態 102
-
-   54 expr: expr NE . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 142
-
-
-狀態 103
-
-   53 expr: expr EQ . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 143
-
-
-狀態 104
-
-   60 expr: expr RS . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 144
-
-
-狀態 105
-
-   59 expr: expr LS . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 145
-
-
-狀態 106
-
-   61 expr: expr '+' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 146
-
-
-狀態 107
-
-   62 expr: expr '-' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 147
-
-
-狀態 108
-
-   63 expr: expr '*' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 148
-
-
-狀態 109
-
-   64 expr: expr '/' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 149
-
-
-狀態 110
-
-   65 expr: expr '%' . expr
-   66     | expr '%' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 150
-
-
-狀態 111
-
-   25 stmt: expr ';' .
-
-    $預設  使用規則 25 以縮減 (stmt)
-
-
-狀態 112
-
-   36 expr: ID '=' expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 36 以縮減 (expr)
-
-
-狀態 113
-
-   46 expr: ID RA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 46 以縮減 (expr)
-
-
-狀態 114
-
-   45 expr: ID LA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 45 以縮減 (expr)
-
-
-狀態 115
-
-   44 expr: ID OA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 44 以縮減 (expr)
-
-
-狀態 116
-
-   43 expr: ID XA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 43 以縮減 (expr)
-
-
-狀態 117
-
-   42 expr: ID AA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 42 以縮減 (expr)
-
-
-狀態 118
-
-   41 expr: ID MA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 41 以縮減 (expr)
-
-
-狀態 119
-
-   40 expr: ID DA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 40 以縮減 (expr)
-
-
-狀態 120
-
-   39 expr: ID TA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 39 以縮減 (expr)
-
-
-狀態 121
-
-   38 expr: ID NA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 38 以縮減 (expr)
-
-
-狀態 122
-
-   37 expr: ID PA expr .
-   48     | expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 37 以縮減 (expr)
-
-
-狀態 123
-
-   18 args: args . ',' type ID
-   84 expr: ID '(' args . ')'
-
-    ')'  偏移，並進入狀態 151
-    ','  偏移，並進入狀態 29
-
-
-狀態 124
-
-   34 exprs: exprs . ',' expr
-   83 expr: ID '(' exprs . ')'
-
-    ')'  偏移，並進入狀態 152
-    ','  偏移，並進入狀態 153
-
-
-狀態 125
-
-   35 exprs: expr .
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 35 以縮減 (exprs)
-
-
-狀態 126
-
-   28 stmt: DO L stmt . WHILE '(' expr M N L ')' ';'
-
-    WHILE  偏移，並進入狀態 154
-
-
-狀態 127
-
-   29 stmt: FOR '(' expr . O ';' L expr M N ';' L expr O N ')' L stmt
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 88 以縮減 (O)
-
-    O  進入狀態 155
-
-
-狀態 128
-
-   26 stmt: IF '(' expr . M ')' stmt N L else_stmt L
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 86 以縮減 (M)
-
-    M  進入狀態 156
-
-
-狀態 129
-
-   30 stmt: RETURN expr ';' .
-
-    $預設  使用規則 30 以縮減 (stmt)
-
-
-狀態 130
-
-   27 stmt: WHILE '(' L . expr M ')' stmt N L
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 157
-
-
-狀態 131
-
-   71 expr: '(' expr ')' .
-
-    $預設  使用規則 71 以縮減 (expr)
-
-
-狀態 132
-
-   32 stmt: '{' stmts '}' .
-
-    $預設  使用規則 32 以縮減 (stmt)
-
-
-狀態 133
-
-   48 expr: expr . OR expr
-   48     | expr OR expr .
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 48 以縮減 (expr)
-
-
-狀態 134
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   49     | expr AN expr .
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 49 以縮減 (expr)
-
-
-狀態 135
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   50     | expr '|' expr .
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 50 以縮減 (expr)
-
-
-狀態 136
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   51     | expr '^' expr .
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 51 以縮減 (expr)
-
-
-狀態 137
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   52     | expr '&' expr .
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 52 以縮減 (expr)
-
-
-狀態 138
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   55     | expr '<' expr .
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 55 以縮減 (expr)
-
-
-狀態 139
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   56     | expr '>' expr .
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 56 以縮減 (expr)
-
-
-狀態 140
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   58     | expr GE expr .
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 58 以縮減 (expr)
-
-
-狀態 141
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   57     | expr LE expr .
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 57 以縮減 (expr)
-
-
-狀態 142
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   54     | expr NE expr .
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 54 以縮減 (expr)
-
-
-狀態 143
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   53     | expr EQ expr .
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 53 以縮減 (expr)
-
-
-狀態 144
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   60     | expr RS expr .
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 60 以縮減 (expr)
-
-
-狀態 145
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   59     | expr LS expr .
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 59 以縮減 (expr)
-
-
-狀態 146
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   61     | expr '+' expr .
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 61 以縮減 (expr)
-
-
-狀態 147
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   62     | expr '-' expr .
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 62 以縮減 (expr)
-
-
-狀態 148
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   63     | expr '*' expr .
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    $預設  使用規則 63 以縮減 (expr)
-
-
-狀態 149
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   64     | expr '/' expr .
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    $預設  使用規則 64 以縮減 (expr)
-
-
-狀態 150
-
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   65     | expr '%' expr .
-   66     | expr . '%' expr
-   66     | expr '%' expr .
-
-    OR       使用規則 65 以縮減 (expr)
-    OR       [使用規則 66 以縮減 (expr)]
-    AN       使用規則 65 以縮減 (expr)
-    AN       [使用規則 66 以縮減 (expr)]
-    '|'      使用規則 65 以縮減 (expr)
-    '|'      [使用規則 66 以縮減 (expr)]
-    '^'      使用規則 65 以縮減 (expr)
-    '^'      [使用規則 66 以縮減 (expr)]
-    '&'      使用規則 65 以縮減 (expr)
-    '&'      [使用規則 66 以縮減 (expr)]
-    '<'      使用規則 65 以縮減 (expr)
-    '<'      [使用規則 66 以縮減 (expr)]
-    '>'      使用規則 65 以縮減 (expr)
-    '>'      [使用規則 66 以縮減 (expr)]
-    GE       使用規則 65 以縮減 (expr)
-    GE       [使用規則 66 以縮減 (expr)]
-    LE       使用規則 65 以縮減 (expr)
-    LE       [使用規則 66 以縮減 (expr)]
-    NE       使用規則 65 以縮減 (expr)
-    NE       [使用規則 66 以縮減 (expr)]
-    EQ       使用規則 65 以縮減 (expr)
-    EQ       [使用規則 66 以縮減 (expr)]
-    RS       使用規則 65 以縮減 (expr)
-    RS       [使用規則 66 以縮減 (expr)]
-    LS       使用規則 65 以縮減 (expr)
-    LS       [使用規則 66 以縮減 (expr)]
-    '+'      使用規則 65 以縮減 (expr)
-    '+'      [使用規則 66 以縮減 (expr)]
-    '-'      使用規則 65 以縮減 (expr)
-    '-'      [使用規則 66 以縮減 (expr)]
-    '*'      使用規則 65 以縮減 (expr)
-    '*'      [使用規則 66 以縮減 (expr)]
-    '/'      使用規則 65 以縮減 (expr)
-    '/'      [使用規則 66 以縮減 (expr)]
-    '%'      使用規則 65 以縮減 (expr)
-    '%'      [使用規則 66 以縮減 (expr)]
-    ')'      使用規則 65 以縮減 (expr)
-    ')'      [使用規則 66 以縮減 (expr)]
-    ';'      使用規則 65 以縮減 (expr)
-    ';'      [使用規則 66 以縮減 (expr)]
-    ','      使用規則 65 以縮減 (expr)
-    ','      [使用規則 66 以縮減 (expr)]
-    $預設  使用規則 65 以縮減 (expr)
-
-
-狀態 151
-
-   84 expr: ID '(' args ')' .
-
-    $預設  使用規則 84 以縮減 (expr)
-
-
-狀態 152
-
-   83 expr: ID '(' exprs ')' .
-
-    $預設  使用規則 83 以縮減 (expr)
-
-
-狀態 153
-
-   34 exprs: exprs ',' . expr
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 158
-
-
-狀態 154
-
-   28 stmt: DO L stmt WHILE . '(' expr M N L ')' ';'
-
-    '('  偏移，並進入狀態 159
-
-
-狀態 155
-
-   29 stmt: FOR '(' expr O . ';' L expr M N ';' L expr O N ')' L stmt
-
-    ';'  偏移，並進入狀態 160
-
-
-狀態 156
-
-   26 stmt: IF '(' expr M . ')' stmt N L else_stmt L
-
-    ')'  偏移，並進入狀態 161
-
-
-狀態 157
-
-   27 stmt: WHILE '(' L expr . M ')' stmt N L
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 86 以縮減 (M)
-
-    M  進入狀態 162
-
-
-狀態 158
-
-   34 exprs: exprs ',' expr .
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 34 以縮減 (exprs)
-
-
-狀態 159
-
-   28 stmt: DO L stmt WHILE '(' . expr M N L ')' ';'
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 163
-
-
-狀態 160
-
-   29 stmt: FOR '(' expr O ';' . L expr M N ';' L expr O N ')' L stmt
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 164
-
-
-狀態 161
-
-   26 stmt: IF '(' expr M ')' . stmt N L else_stmt L
-
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
-
-    stmt  進入狀態 165
-    expr  進入狀態 61
-
-
-狀態 162
-
-   27 stmt: WHILE '(' L expr M . ')' stmt N L
-
-    ')'  偏移，並進入狀態 166
-
-
-狀態 163
-
-   28 stmt: DO L stmt WHILE '(' expr . M N L ')' ';'
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 86 以縮減 (M)
-
-    M  進入狀態 167
-
-
-狀態 164
-
-   29 stmt: FOR '(' expr O ';' L . expr M N ';' L expr O N ')' L stmt
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 168
-
-
-狀態 165
-
-   26 stmt: IF '(' expr M ')' stmt . N L else_stmt L
-
-    $預設  使用規則 87 以縮減 (N)
-
-    N  進入狀態 169
-
-
-狀態 166
-
-   27 stmt: WHILE '(' L expr M ')' . stmt N L
-
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
-
-    stmt  進入狀態 170
-    expr  進入狀態 61
-
-
-狀態 167
-
-   28 stmt: DO L stmt WHILE '(' expr M . N L ')' ';'
-
-    $預設  使用規則 87 以縮減 (N)
-
-    N  進入狀態 171
-
-
-狀態 168
-
-   29 stmt: FOR '(' expr O ';' L expr . M N ';' L expr O N ')' L stmt
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 86 以縮減 (M)
-
-    M  進入狀態 172
-
-
-狀態 169
-
-   26 stmt: IF '(' expr M ')' stmt N . L else_stmt L
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 173
-
-
-狀態 170
-
-   27 stmt: WHILE '(' L expr M ')' stmt . N L
-
-    $預設  使用規則 87 以縮減 (N)
-
-    N  進入狀態 174
-
-
-狀態 171
-
-   28 stmt: DO L stmt WHILE '(' expr M N . L ')' ';'
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 175
-
-
-狀態 172
-
-   29 stmt: FOR '(' expr O ';' L expr M . N ';' L expr O N ')' L stmt
-
-    $預設  使用規則 87 以縮減 (N)
-
-    N  進入狀態 176
-
-
-狀態 173
-
-   26 stmt: IF '(' expr M ')' stmt N L . else_stmt L
-
-    ELSE  偏移，並進入狀態 177
-
-    else_stmt  進入狀態 178
-
-
-狀態 174
-
-   27 stmt: WHILE '(' L expr M ')' stmt N . L
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 179
-
-
-狀態 175
-
-   28 stmt: DO L stmt WHILE '(' expr M N L . ')' ';'
-
-    ')'  偏移，並進入狀態 180
-
-
-狀態 176
-
-   29 stmt: FOR '(' expr O ';' L expr M N . ';' L expr O N ')' L stmt
-
-    ';'  偏移，並進入狀態 181
-
-
-狀態 177
-
-    3 else_stmt: ELSE . stmt
-
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
-
-    stmt  進入狀態 182
-    expr  進入狀態 61
-
-
-狀態 178
-
-   26 stmt: IF '(' expr M ')' stmt N L else_stmt . L
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 183
-
-
-狀態 179
-
-   27 stmt: WHILE '(' L expr M ')' stmt N L .
-
-    $預設  使用規則 27 以縮減 (stmt)
-
-
-狀態 180
-
-   28 stmt: DO L stmt WHILE '(' expr M N L ')' . ';'
-
-    ';'  偏移，並進入狀態 184
-
-
-狀態 181
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' . L expr O N ')' L stmt
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 185
-
-
-狀態 182
-
-    3 else_stmt: ELSE stmt .
-
-    $預設  使用規則 3 以縮減 (else_stmt)
-
-
-狀態 183
-
-   26 stmt: IF '(' expr M ')' stmt N L else_stmt L .
-
-    $預設  使用規則 26 以縮減 (stmt)
-
-
-狀態 184
-
-   28 stmt: DO L stmt WHILE '(' expr M N L ')' ';' .
-
-    $預設  使用規則 28 以縮減 (stmt)
-
-
-狀態 185
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L . expr O N ')' L stmt
-
-    ID     偏移，並進入狀態 37
-    INT8   偏移，並進入狀態 38
-    INT16  偏移，並進入狀態 39
-    INT32  偏移，並進入狀態 40
-    FLT    偏移，並進入狀態 41
-    STR    偏移，並進入狀態 42
-    '+'    偏移，並進入狀態 49
-    '-'    偏移，並進入狀態 50
-    '!'    偏移，並進入狀態 51
-    '~'    偏移，並進入狀態 52
-    NN     偏移，並進入狀態 53
-    PP     偏移，並進入狀態 54
-    '('    偏移，並進入狀態 55
-    '$'    偏移，並進入狀態 59
-
-    expr  進入狀態 186
-
-
-狀態 186
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L expr . O N ')' L stmt
-   48 expr: expr . OR expr
-   49     | expr . AN expr
-   50     | expr . '|' expr
-   51     | expr . '^' expr
-   52     | expr . '&' expr
-   53     | expr . EQ expr
-   54     | expr . NE expr
-   55     | expr . '<' expr
-   56     | expr . '>' expr
-   57     | expr . LE expr
-   58     | expr . GE expr
-   59     | expr . LS expr
-   60     | expr . RS expr
-   61     | expr . '+' expr
-   62     | expr . '-' expr
-   63     | expr . '*' expr
-   64     | expr . '/' expr
-   65     | expr . '%' expr
-   66     | expr . '%' expr
-
-    OR   偏移，並進入狀態 93
-    AN   偏移，並進入狀態 94
-    '|'  偏移，並進入狀態 95
-    '^'  偏移，並進入狀態 96
-    '&'  偏移，並進入狀態 97
-    '<'  偏移，並進入狀態 98
-    '>'  偏移，並進入狀態 99
-    GE   偏移，並進入狀態 100
-    LE   偏移，並進入狀態 101
-    NE   偏移，並進入狀態 102
-    EQ   偏移，並進入狀態 103
-    RS   偏移，並進入狀態 104
-    LS   偏移，並進入狀態 105
-    '+'  偏移，並進入狀態 106
-    '-'  偏移，並進入狀態 107
-    '*'  偏移，並進入狀態 108
-    '/'  偏移，並進入狀態 109
-    '%'  偏移，並進入狀態 110
-
-    $預設  使用規則 88 以縮減 (O)
-
-    O  進入狀態 187
-
-
-狀態 187
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L expr O . N ')' L stmt
-
-    $預設  使用規則 87 以縮減 (N)
-
-    N  進入狀態 188
-
-
-狀態 188
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L expr O N . ')' L stmt
-
-    ')'  偏移，並進入狀態 189
-
-
-狀態 189
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L expr O N ')' . L stmt
-
-    $預設  使用規則 85 以縮減 (L)
-
-    L  進入狀態 190
-
-
-狀態 190
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L expr O N ')' L . stmt
-
-    error   偏移，並進入狀態 36
-    ID      偏移，並進入狀態 37
-    INT8    偏移，並進入狀態 38
-    INT16   偏移，並進入狀態 39
-    INT32   偏移，並進入狀態 40
-    FLT     偏移，並進入狀態 41
-    STR     偏移，並進入狀態 42
-    DO      偏移，並進入狀態 43
-    FOR     偏移，並進入狀態 44
-    IF      偏移，並進入狀態 45
-    RETURN  偏移，並進入狀態 46
-    WHILE   偏移，並進入狀態 47
-    BREAK   偏移，並進入狀態 48
-    '+'     偏移，並進入狀態 49
-    '-'     偏移，並進入狀態 50
-    '!'     偏移，並進入狀態 51
-    '~'     偏移，並進入狀態 52
-    NN      偏移，並進入狀態 53
-    PP      偏移，並進入狀態 54
-    '('     偏移，並進入狀態 55
-    '{'     偏移，並進入狀態 56
-    ';'     偏移，並進入狀態 58
-    '$'     偏移，並進入狀態 59
-
-    stmt  進入狀態 191
-    expr  進入狀態 61
-
-
-狀態 191
-
-   29 stmt: FOR '(' expr O ';' L expr M N ';' L expr O N ')' L stmt .
-
-    $預設  使用規則 29 以縮減 (stmt)
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	';'  shift 127
+	.  error
+
+
+state 81
+	stmt : WHILE '(' . L expr M ')' stmt N L  (27)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 128
+
+
+state 82
+	stmt : BREAK ';' .  (31)
+
+	.  reduce 31
+
+
+state 83
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	expr : '+' expr .  (69)
+
+	.  reduce 69
+
+
+state 84
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	expr : '-' expr .  (70)
+
+	.  reduce 70
+
+
+state 85
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	expr : '!' expr .  (67)
+
+	.  reduce 67
+
+
+state 86
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	expr : '~' expr .  (68)
+
+	.  reduce 68
+
+
+state 87
+	expr : PP ID .  (73)
+
+	.  reduce 73
+
+
+state 88
+	expr : NN ID .  (74)
+
+	.  reduce 74
+
+
+state 89
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	expr : '(' expr . ')'  (71)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  shift 129
+	.  error
+
+
+state 90
+	stmts : stmts . stmt  (22)
+	stmt : '{' stmts . '}'  (32)
+
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	'}'  shift 130
+	';'  shift 57
+	'$'  shift 58
+	.  error
+
+	stmt  goto 59
+	expr  goto 60
+
+
+state 91
+	expr : '$' INT8 .  (72)
+
+	.  reduce 72
+
+
+state 92
+	expr : expr OR . expr  (48)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 131
+
+
+state 93
+	expr : expr AN . expr  (49)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 132
+
+
+state 94
+	expr : expr '|' . expr  (50)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 133
+
+
+state 95
+	expr : expr '^' . expr  (51)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 134
+
+
+state 96
+	expr : expr '&' . expr  (52)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 135
+
+
+state 97
+	expr : expr EQ . expr  (53)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 136
+
+
+state 98
+	expr : expr NE . expr  (54)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 137
+
+
+state 99
+	expr : expr LE . expr  (57)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 138
+
+
+state 100
+	expr : expr '<' . expr  (55)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 139
+
+
+state 101
+	expr : expr GE . expr  (58)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 140
+
+
+state 102
+	expr : expr '>' . expr  (56)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 141
+
+
+state 103
+	expr : expr LS . expr  (59)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 142
+
+
+state 104
+	expr : expr RS . expr  (60)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 143
+
+
+state 105
+	expr : expr '+' . expr  (61)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 144
+
+
+state 106
+	expr : expr '-' . expr  (62)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 145
+
+
+state 107
+	expr : expr '*' . expr  (63)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 146
+
+
+state 108
+	expr : expr '/' . expr  (64)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 147
+
+
+state 109
+	expr : expr '%' . expr  (65)
+	expr : expr '%' . expr  (66)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 148
+
+
+state 110
+	stmt : expr ';' .  (25)
+
+	.  reduce 25
+
+
+state 111
+	expr : ID '=' expr .  (36)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 36
+	';'  reduce 36
+	','  reduce 36
+
+
+state 112
+	expr : ID PA expr .  (37)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 37
+	';'  reduce 37
+	','  reduce 37
+
+
+state 113
+	expr : ID NA expr .  (38)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 38
+	';'  reduce 38
+	','  reduce 38
+
+
+state 114
+	expr : ID TA expr .  (39)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 39
+	';'  reduce 39
+	','  reduce 39
+
+
+state 115
+	expr : ID DA expr .  (40)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 40
+	';'  reduce 40
+	','  reduce 40
+
+
+state 116
+	expr : ID MA expr .  (41)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 41
+	';'  reduce 41
+	','  reduce 41
+
+
+state 117
+	expr : ID AA expr .  (42)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 42
+	';'  reduce 42
+	','  reduce 42
+
+
+state 118
+	expr : ID XA expr .  (43)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 43
+	';'  reduce 43
+	','  reduce 43
+
+
+state 119
+	expr : ID OA expr .  (44)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 44
+	';'  reduce 44
+	','  reduce 44
+
+
+state 120
+	expr : ID LA expr .  (45)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 45
+	';'  reduce 45
+	','  reduce 45
+
+
+state 121
+	expr : ID RA expr .  (46)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 46
+	';'  reduce 46
+	','  reduce 46
+
+
+state 122
+	exprs : expr .  (35)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 35
+	','  reduce 35
+
+
+state 123
+	exprs : exprs . ',' expr  (34)
+	expr : ID '(' exprs . ')'  (82)
+
+	')'  shift 149
+	','  shift 150
+	.  error
+
+
+state 124
+	stmt : DO L stmt . WHILE '(' expr M N L ')' ';'  (28)
+
+	WHILE  shift 151
+	.  error
+
+
+state 125
+	stmt : FOR '(' expr . O ';' L expr M N ';' L expr O N ')' L stmt  (29)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	O : .  (88)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	';'  reduce 88
+
+	O  goto 152
+
+
+state 126
+	stmt : IF '(' expr . M ')' stmt N L else_stmt L  (26)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	M : .  (85)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 85
+
+	M  goto 153
+
+
+state 127
+	stmt : RETURN expr ';' .  (30)
+
+	.  reduce 30
+
+
+state 128
+	stmt : WHILE '(' L . expr M ')' stmt N L  (27)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 154
+
+
+state 129
+	expr : '(' expr ')' .  (71)
+
+	.  reduce 71
+
+
+state 130
+	stmt : '{' stmts '}' .  (32)
+
+	.  reduce 32
+
+
+state 131
+	expr : expr . OR expr  (48)
+	expr : expr OR expr .  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 48
+	')'  reduce 48
+	';'  reduce 48
+	','  reduce 48
+
+
+state 132
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr AN expr .  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 49
+	AN  reduce 49
+	')'  reduce 49
+	';'  reduce 49
+	','  reduce 49
+
+
+state 133
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr '|' expr .  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 50
+	AN  reduce 50
+	'|'  reduce 50
+	')'  reduce 50
+	';'  reduce 50
+	','  reduce 50
+
+
+state 134
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr '^' expr .  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 51
+	AN  reduce 51
+	'|'  reduce 51
+	'^'  reduce 51
+	')'  reduce 51
+	';'  reduce 51
+	','  reduce 51
+
+
+state 135
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr '&' expr .  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 52
+	AN  reduce 52
+	'|'  reduce 52
+	'^'  reduce 52
+	'&'  reduce 52
+	')'  reduce 52
+	';'  reduce 52
+	','  reduce 52
+
+
+state 136
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr EQ expr .  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 53
+	AN  reduce 53
+	'|'  reduce 53
+	'^'  reduce 53
+	'&'  reduce 53
+	EQ  reduce 53
+	NE  reduce 53
+	LE  reduce 53
+	'<'  reduce 53
+	GE  reduce 53
+	'>'  reduce 53
+	')'  reduce 53
+	';'  reduce 53
+	','  reduce 53
+
+
+state 137
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr NE expr .  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 54
+	AN  reduce 54
+	'|'  reduce 54
+	'^'  reduce 54
+	'&'  reduce 54
+	EQ  reduce 54
+	NE  reduce 54
+	LE  reduce 54
+	'<'  reduce 54
+	GE  reduce 54
+	'>'  reduce 54
+	')'  reduce 54
+	';'  reduce 54
+	','  reduce 54
+
+
+state 138
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr LE expr .  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 57
+	AN  reduce 57
+	'|'  reduce 57
+	'^'  reduce 57
+	'&'  reduce 57
+	EQ  reduce 57
+	NE  reduce 57
+	LE  reduce 57
+	'<'  reduce 57
+	GE  reduce 57
+	'>'  reduce 57
+	')'  reduce 57
+	';'  reduce 57
+	','  reduce 57
+
+
+state 139
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr '<' expr .  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 55
+	AN  reduce 55
+	'|'  reduce 55
+	'^'  reduce 55
+	'&'  reduce 55
+	EQ  reduce 55
+	NE  reduce 55
+	LE  reduce 55
+	'<'  reduce 55
+	GE  reduce 55
+	'>'  reduce 55
+	')'  reduce 55
+	';'  reduce 55
+	','  reduce 55
+
+
+state 140
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr GE expr .  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 58
+	AN  reduce 58
+	'|'  reduce 58
+	'^'  reduce 58
+	'&'  reduce 58
+	EQ  reduce 58
+	NE  reduce 58
+	LE  reduce 58
+	'<'  reduce 58
+	GE  reduce 58
+	'>'  reduce 58
+	')'  reduce 58
+	';'  reduce 58
+	','  reduce 58
+
+
+state 141
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr '>' expr .  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 56
+	AN  reduce 56
+	'|'  reduce 56
+	'^'  reduce 56
+	'&'  reduce 56
+	EQ  reduce 56
+	NE  reduce 56
+	LE  reduce 56
+	'<'  reduce 56
+	GE  reduce 56
+	'>'  reduce 56
+	')'  reduce 56
+	';'  reduce 56
+	','  reduce 56
+
+
+state 142
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr LS expr .  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 59
+	AN  reduce 59
+	'|'  reduce 59
+	'^'  reduce 59
+	'&'  reduce 59
+	EQ  reduce 59
+	NE  reduce 59
+	LE  reduce 59
+	'<'  reduce 59
+	GE  reduce 59
+	'>'  reduce 59
+	LS  reduce 59
+	RS  reduce 59
+	')'  reduce 59
+	';'  reduce 59
+	','  reduce 59
+
+
+state 143
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr RS expr .  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 60
+	AN  reduce 60
+	'|'  reduce 60
+	'^'  reduce 60
+	'&'  reduce 60
+	EQ  reduce 60
+	NE  reduce 60
+	LE  reduce 60
+	'<'  reduce 60
+	GE  reduce 60
+	'>'  reduce 60
+	LS  reduce 60
+	RS  reduce 60
+	')'  reduce 60
+	';'  reduce 60
+	','  reduce 60
+
+
+state 144
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr '+' expr .  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 61
+	AN  reduce 61
+	'|'  reduce 61
+	'^'  reduce 61
+	'&'  reduce 61
+	EQ  reduce 61
+	NE  reduce 61
+	LE  reduce 61
+	'<'  reduce 61
+	GE  reduce 61
+	'>'  reduce 61
+	LS  reduce 61
+	RS  reduce 61
+	'+'  reduce 61
+	'-'  reduce 61
+	')'  reduce 61
+	';'  reduce 61
+	','  reduce 61
+
+
+state 145
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr '-' expr .  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	OR  reduce 62
+	AN  reduce 62
+	'|'  reduce 62
+	'^'  reduce 62
+	'&'  reduce 62
+	EQ  reduce 62
+	NE  reduce 62
+	LE  reduce 62
+	'<'  reduce 62
+	GE  reduce 62
+	'>'  reduce 62
+	LS  reduce 62
+	RS  reduce 62
+	'+'  reduce 62
+	'-'  reduce 62
+	')'  reduce 62
+	';'  reduce 62
+	','  reduce 62
+
+
+state 146
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr '*' expr .  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	.  reduce 63
+
+
+state 147
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr '/' expr .  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	.  reduce 64
+
+
+148: reduce/reduce conflict (reduce 65, reduce 66) on OR
+148: reduce/reduce conflict (reduce 65, reduce 66) on AN
+148: reduce/reduce conflict (reduce 65, reduce 66) on '|'
+148: reduce/reduce conflict (reduce 65, reduce 66) on '^'
+148: reduce/reduce conflict (reduce 65, reduce 66) on '&'
+148: reduce/reduce conflict (reduce 65, reduce 66) on EQ
+148: reduce/reduce conflict (reduce 65, reduce 66) on NE
+148: reduce/reduce conflict (reduce 65, reduce 66) on LE
+148: reduce/reduce conflict (reduce 65, reduce 66) on '<'
+148: reduce/reduce conflict (reduce 65, reduce 66) on GE
+148: reduce/reduce conflict (reduce 65, reduce 66) on '>'
+148: reduce/reduce conflict (reduce 65, reduce 66) on LS
+148: reduce/reduce conflict (reduce 65, reduce 66) on RS
+148: reduce/reduce conflict (reduce 65, reduce 66) on '+'
+148: reduce/reduce conflict (reduce 65, reduce 66) on '-'
+148: reduce/reduce conflict (reduce 65, reduce 66) on '*'
+148: reduce/reduce conflict (reduce 65, reduce 66) on '/'
+148: reduce/reduce conflict (reduce 65, reduce 66) on '%'
+148: reduce/reduce conflict (reduce 65, reduce 66) on ')'
+148: reduce/reduce conflict (reduce 65, reduce 66) on ';'
+148: reduce/reduce conflict (reduce 65, reduce 66) on ','
+state 148
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr '%' expr .  (65)
+	expr : expr . '%' expr  (66)
+	expr : expr '%' expr .  (66)
+
+	.  reduce 65
+
+
+state 149
+	expr : ID '(' exprs ')' .  (82)
+
+	.  reduce 82
+
+
+state 150
+	exprs : exprs ',' . expr  (34)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 155
+
+
+state 151
+	stmt : DO L stmt WHILE . '(' expr M N L ')' ';'  (28)
+
+	'('  shift 156
+	.  error
+
+
+state 152
+	stmt : FOR '(' expr O . ';' L expr M N ';' L expr O N ')' L stmt  (29)
+
+	';'  shift 157
+	.  error
+
+
+state 153
+	stmt : IF '(' expr M . ')' stmt N L else_stmt L  (26)
+
+	')'  shift 158
+	.  error
+
+
+state 154
+	stmt : WHILE '(' L expr . M ')' stmt N L  (27)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	M : .  (85)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 85
+
+	M  goto 159
+
+
+state 155
+	exprs : exprs ',' expr .  (34)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 34
+	','  reduce 34
+
+
+state 156
+	stmt : DO L stmt WHILE '(' . expr M N L ')' ';'  (28)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 160
+
+
+state 157
+	stmt : FOR '(' expr O ';' . L expr M N ';' L expr O N ')' L stmt  (29)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 161
+
+
+state 158
+	stmt : IF '(' expr M ')' . stmt N L else_stmt L  (26)
+
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	';'  shift 57
+	'$'  shift 58
+	.  error
+
+	stmt  goto 162
+	expr  goto 60
+
+
+state 159
+	stmt : WHILE '(' L expr M . ')' stmt N L  (27)
+
+	')'  shift 163
+	.  error
+
+
+state 160
+	stmt : DO L stmt WHILE '(' expr . M N L ')' ';'  (28)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	M : .  (85)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 85
+
+	M  goto 164
+
+
+state 161
+	stmt : FOR '(' expr O ';' L . expr M N ';' L expr O N ')' L stmt  (29)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 165
+
+
+state 162
+	stmt : IF '(' expr M ')' stmt . N L else_stmt L  (26)
+	N : .  (86)
+
+	.  reduce 86
+
+	N  goto 166
+
+
+state 163
+	stmt : WHILE '(' L expr M ')' . stmt N L  (27)
+
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	';'  shift 57
+	'$'  shift 58
+	.  error
+
+	stmt  goto 167
+	expr  goto 60
+
+
+state 164
+	stmt : DO L stmt WHILE '(' expr M . N L ')' ';'  (28)
+	N : .  (86)
+
+	.  reduce 86
+
+	N  goto 168
+
+
+state 165
+	stmt : FOR '(' expr O ';' L expr . M N ';' L expr O N ')' L stmt  (29)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	M : .  (85)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	';'  reduce 85
+
+	M  goto 169
+
+
+state 166
+	stmt : IF '(' expr M ')' stmt N . L else_stmt L  (26)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 170
+
+
+state 167
+	stmt : WHILE '(' L expr M ')' stmt . N L  (27)
+	N : .  (86)
+
+	.  reduce 86
+
+	N  goto 171
+
+
+state 168
+	stmt : DO L stmt WHILE '(' expr M N . L ')' ';'  (28)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 172
+
+
+state 169
+	stmt : FOR '(' expr O ';' L expr M . N ';' L expr O N ')' L stmt  (29)
+	N : .  (86)
+
+	.  reduce 86
+
+	N  goto 173
+
+
+state 170
+	stmt : IF '(' expr M ')' stmt N L . else_stmt L  (26)
+
+	ELSE  shift 174
+	.  error
+
+	else_stmt  goto 175
+
+
+state 171
+	stmt : WHILE '(' L expr M ')' stmt N . L  (27)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 176
+
+
+state 172
+	stmt : DO L stmt WHILE '(' expr M N L . ')' ';'  (28)
+
+	')'  shift 177
+	.  error
+
+
+state 173
+	stmt : FOR '(' expr O ';' L expr M N . ';' L expr O N ')' L stmt  (29)
+
+	';'  shift 178
+	.  error
+
+
+state 174
+	else_stmt : ELSE . stmt  (3)
+
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	';'  shift 57
+	'$'  shift 58
+	.  error
+
+	stmt  goto 179
+	expr  goto 60
+
+
+state 175
+	stmt : IF '(' expr M ')' stmt N L else_stmt . L  (26)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 180
+
+
+state 176
+	stmt : WHILE '(' L expr M ')' stmt N L .  (27)
+
+	.  reduce 27
+
+
+state 177
+	stmt : DO L stmt WHILE '(' expr M N L ')' . ';'  (28)
+
+	';'  shift 181
+	.  error
+
+
+state 178
+	stmt : FOR '(' expr O ';' L expr M N ';' . L expr O N ')' L stmt  (29)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 182
+
+
+state 179
+	else_stmt : ELSE stmt .  (3)
+
+	.  reduce 3
+
+
+state 180
+	stmt : IF '(' expr M ')' stmt N L else_stmt L .  (26)
+
+	.  reduce 26
+
+
+state 181
+	stmt : DO L stmt WHILE '(' expr M N L ')' ';' .  (28)
+
+	.  reduce 28
+
+
+state 182
+	stmt : FOR '(' expr O ';' L expr M N ';' L . expr O N ')' L stmt  (29)
+
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'$'  shift 58
+	.  error
+
+	expr  goto 183
+
+
+state 183
+	stmt : FOR '(' expr O ';' L expr M N ';' L expr . O N ')' L stmt  (29)
+	expr : expr . OR expr  (48)
+	expr : expr . AN expr  (49)
+	expr : expr . '|' expr  (50)
+	expr : expr . '^' expr  (51)
+	expr : expr . '&' expr  (52)
+	expr : expr . EQ expr  (53)
+	expr : expr . NE expr  (54)
+	expr : expr . '<' expr  (55)
+	expr : expr . '>' expr  (56)
+	expr : expr . LE expr  (57)
+	expr : expr . GE expr  (58)
+	expr : expr . LS expr  (59)
+	expr : expr . RS expr  (60)
+	expr : expr . '+' expr  (61)
+	expr : expr . '-' expr  (62)
+	expr : expr . '*' expr  (63)
+	expr : expr . '/' expr  (64)
+	expr : expr . '%' expr  (65)
+	expr : expr . '%' expr  (66)
+	O : .  (88)
+
+	OR  shift 92
+	AN  shift 93
+	'|'  shift 94
+	'^'  shift 95
+	'&'  shift 96
+	EQ  shift 97
+	NE  shift 98
+	LE  shift 99
+	'<'  shift 100
+	GE  shift 101
+	'>'  shift 102
+	LS  shift 103
+	RS  shift 104
+	'+'  shift 105
+	'-'  shift 106
+	'*'  shift 107
+	'/'  shift 108
+	'%'  shift 109
+	')'  reduce 88
+
+	O  goto 184
+
+
+state 184
+	stmt : FOR '(' expr O ';' L expr M N ';' L expr O . N ')' L stmt  (29)
+	N : .  (86)
+
+	.  reduce 86
+
+	N  goto 185
+
+
+state 185
+	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N . ')' L stmt  (29)
+
+	')'  shift 186
+	.  error
+
+
+state 186
+	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N ')' . L stmt  (29)
+	L : .  (84)
+
+	.  reduce 84
+
+	L  goto 187
+
+
+state 187
+	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N ')' L . stmt  (29)
+
+	error  shift 35
+	ID  shift 36
+	INT8  shift 37
+	INT16  shift 38
+	INT32  shift 39
+	FLT  shift 40
+	STR  shift 41
+	DO  shift 42
+	FOR  shift 43
+	IF  shift 44
+	RETURN  shift 45
+	WHILE  shift 46
+	BREAK  shift 47
+	'+'  shift 48
+	'-'  shift 49
+	'!'  shift 50
+	'~'  shift 51
+	PP  shift 52
+	NN  shift 53
+	'('  shift 54
+	'{'  shift 55
+	';'  shift 57
+	'$'  shift 58
+	.  error
+
+	stmt  goto 188
+	expr  goto 60
+
+
+state 188
+	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N ')' L stmt .  (29)
+
+	.  reduce 29
+
+
+Rules never reduced:
+	expr : expr '%' expr  (66)
+	K :  (83)
+	P :  (87)
+
+
+State 148 contains 21 reduce/reduce conflicts.
+
+
+61 terminals, 24 nonterminals
+89 grammar rules, 189 states

@@ -18,6 +18,8 @@ static int offsp = -1;
 
 static Type return_type;
 
+static char buffer[255];	
+
 /* stack operations */
 #define top_tblptr	(tblptr[tblsp])
 #define top_offset	(offset[offsp])
@@ -47,7 +49,7 @@ typedef struct Expr Expr;
   char *str;    /* token value yylval.str is the value of a string constant */
   unsigned loc; /* location of instruction to backpatch */
   Type typ;	/* type descriptor */
-  //Expr exp;
+  /*Expr exp;*/
 };
 
 /* declare ID token and its attribute type */
@@ -108,9 +110,11 @@ exts	: exts func
 
 func	: MAIN '(' ')' Mmain block
 			{ // need a temporary table pointer
+			  printf("main func\n");
 			  Table *table;
 			  // the type of main is a JVM type descriptor
 			  Type type = mkfun("[Ljava/lang/String;", "V");
+
 			  // emit the epilogue part of main()
 			  emit3(getstatic, constant_pool_add_Fieldref(&cf, "java/lang/System", "out", "Ljava/io/PrintStream;"));
 			  emit(iload_2);
@@ -119,6 +123,7 @@ func	: MAIN '(' ')' Mmain block
 			  // method has public access and is static
 			  cf.methods[cf.method_count].access = ACC_PUBLIC | ACC_STATIC;
 			  // method name is "main"
+
 			  cf.methods[cf.method_count].name = "main";
 			  // method descriptor of "void main(String[] arg)"
 			  cf.methods[cf.method_count].descriptor = type;
@@ -144,23 +149,19 @@ func	: MAIN '(' ')' Mmain block
 			  pop_offset;
 			  // enter the function in the global table
 			  enterproc(top_tblptr, $1, type, table);
+			  printf("main func exit\n");
 			}
 	| type ID '(' Margs args ')' block
 	{  /* TASK 3: TO BE COMPLETED */
-		Table *table;
+			  Table *table;
               // the type of function is a JVM type descriptor
               Type type = mkfun($5, $1);
-
-              emit3(getstatic, constant_pool_add_Fieldref(&cf, "java/lang/System", "out", "Ljava/io/PrintStream;"));
-              emit(iload_2);
-              emit3(invokevirtual, constant_pool_add_Methodref(&cf, "java/io/PrintStream", "println", "(I)V"));
-              emit(return_);
 
               // method has public access and is static
               cf.methods[cf.method_count].access = ACC_PUBLIC | ACC_STATIC;
 
               // method name is ID
-              cf.methods[cf.method_count].name = $2;
+              cf.methods[cf.method_count].name = $2->lexptr;
               cf.methods[cf.method_count].descriptor = type;
               cf.methods[cf.method_count].code_length = pc;
 
@@ -171,7 +172,7 @@ func	: MAIN '(' ')' Mmain block
                 error("Out of memory");
 
               cf.methods[cf.method_count].max_stack = 100;
-	       cf.methods[cf.method_count].max_locals = top_offset;
+	       	  cf.methods[cf.method_count].max_locals = top_offset;
 
               // advance to next method to store in method array
               cf.method_count++;
@@ -184,7 +185,8 @@ func	: MAIN '(' ')' Mmain block
               pop_tblptr;
               pop_offset;
 
-              enterproc(top_tblptr, $2, type, table);
+              enterproc(top_tblptr, $2->lexptr, type, table);
+			  printf("func exit\n");
 	    }
 /*
 	   | ftype Margs args ')' block
@@ -195,6 +197,7 @@ func	: MAIN '(' ')' Mmain block
 	;
 
 Mmain	:		{ int label1, label2;
+
 			  Table *table;
 			  // create new table for local scope of main()
 			  table = mktable(top_tblptr);
@@ -229,6 +232,7 @@ Mmain	:		{ int label1, label2;
 			  backpatch(label2, pc - label2);
 			  // global flag to indicate we're in main()
 			  is_in_main = 1;
+			  printf("Mmain exit\n");
 			}
 	;
 
@@ -236,10 +240,11 @@ Mmain	:		{ int label1, label2;
 Margs	:		{ /* TASK 3: TO BE COMPLETED */
 			  Table *table = mktable(top_tblptr);
 			  push_tblptr(table);
-              		  push_offset(0);
+              push_offset(0);
 
 			  init_code();
 			  is_in_main = 0;
+			  printf("margs exit\n");
 	    		}
 	;
 /*
@@ -252,6 +257,10 @@ ftype	:	type ID '('
 	;
 */
 block	: '{' decls stmts '}'
+{
+	printf("block exit\n");
+}
+
 	;
 
 decls	: decls decl
@@ -278,15 +287,17 @@ args	: args ',' type ID
 list	: list ',' ID	{ /* TASK 1 and 4: TO BE COMPLETED */
 			if (top_tblptr->level == 0)
 			{
+			  	printf("list, global var = %s\n", $3->lexptr);
 				cf.fields[cf.field_count].access = ACC_STATIC;			
 				cf.fields[cf.field_count].name = $3->lexptr;		
 				cf.fields[cf.field_count].descriptor = $1;
-			    	cf.field_count++;
-				enter(top_tblptr, $1, $3, constant_pool_add_Fieldref(&cf, cf.name, $3->lexptr, $1));
+		    	cf.field_count++;
+				enter(top_tblptr, $3, $1, constant_pool_add_Fieldref(&cf, cf.name, $3->lexptr, $1));
 			}
 			else
 			{
-			  enter(top_tblptr, $1, $3, top_offset);
+			    printf("list, local var = %s\n", $3->lexptr);
+			    enter(top_tblptr, $3, $1, top_offset++);
 			}
 
 		    $$ = $1;
@@ -294,6 +305,7 @@ list	: list ',' ID	{ /* TASK 1 and 4: TO BE COMPLETED */
 	| type ID	{ /* TASK 1 and 4: TO BE COMPLETED */
             if (top_tblptr->level == 0)
             {
+			  	printf("list, global var = %s\n", $2->lexptr);
                 cf.fields[cf.field_count].access = ACC_STATIC;
                 cf.fields[cf.field_count].name = $2->lexptr;
                 cf.fields[cf.field_count].descriptor = $1;
@@ -302,9 +314,11 @@ list	: list ',' ID	{ /* TASK 1 and 4: TO BE COMPLETED */
             }
             else
 			{
+				printf("local var = %s\n", $2->lexptr);
 			 	enter(top_tblptr, $2, $1, top_offset++);
 			}
-			 $$ = $1;
+
+			$$ = $1;
 		}
 	;
 
@@ -327,16 +341,19 @@ stmt    : ';'
         | DO L stmt WHILE '(' expr M N L ')' ';'
                	  { backpatch($7, $9 - $7); backpatch($8, $2 - $8); }
         | FOR '(' expr  O ';' L expr M N ';' L expr O N ')' L stmt                        
-                           { backpatch($9, $16 - $9);  
-				emit3(goto_,$11-pc); 
+                           { 
+				backpatch($9, $16 - $9);  
+				emit3(goto_, $11-pc); 
 				backpatch($8, pc - $8);
-			       backpatch($14, $6 - $14); 
+			    backpatch($14, $6 - $14); 
                                   }
         | RETURN expr ';'
-                        { if (is_in_main)
-			  	emit(istore_2);
+                        { 
+
+				if (is_in_main)
+			  		emit(istore_2);
 			    else 
-			  	emit(ireturn);
+			  		emit(ireturn);
 /*
 			    else if (isint(return_type) && isint($2.type))
 			  	emit(ireturn);
@@ -346,10 +363,13 @@ stmt    : ';'
 			  	error("Type error");
 */
 			}
-	 | BREAK ';'	{ /* BREAK is optional to implement */
+	 		| BREAK ';'	{ /* BREAK is optional to implement */
 			  error("break not implemented");
 			}
         | '{' stmts '}'
+		{
+			printf("stmts exit\n");
+		}
         | error ';'     { yyerrok; }
         ;
 
@@ -359,6 +379,7 @@ exprs	: exprs ',' expr
 
 /* TASK 1: TO BE COMPLETED (use pr3 code, then work on assign operators): */
 expr    : ID   '=' expr { 
+				printf("%s = expr, \n", $1->lexptr);
 			    int place = getplace(top_tblptr, $1);
 			    emit(dup);
 			    if (isint(gettype(top_tblptr, $1)))
@@ -391,7 +412,7 @@ expr    : ID   '=' expr {
 		  int place;
             	  if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -413,7 +434,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -433,7 +454,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -453,7 +474,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -473,7 +494,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -493,7 +514,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -506,7 +527,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -526,7 +547,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -546,7 +567,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -566,7 +587,7 @@ expr    : ID   '=' expr {
             int place;
             if (getlevel(top_tblptr, $1) == 1) {
                  place = getplace(top_tblptr, $1);
-                 if (!strcmp(gettype(top_tblptr, $1), "I"))
+                 if (isint(gettype(top_tblptr, $1)))
                      emit2(iload, place);
                  else if (isfloat(gettype(top_tblptr, $1)))
                      emit2(fload, place);
@@ -582,6 +603,7 @@ expr    : ID   '=' expr {
                 }
            }
 	 | ID { int place;
+
 		if (getlevel(top_tblptr, $1) == 0)
 		{
 			emit3( getstatic, getplace(top_tblptr, $1));
@@ -589,11 +611,12 @@ expr    : ID   '=' expr {
                else
 		{
                		place = getplace(top_tblptr, $1);
-                    		if (!strcmp(gettype(top_tblptr, $1), "I"))
+                    		if (isint(gettype(top_tblptr, $1)))
                     			emit2(iload, place);
 				else if (isfloat(gettype(top_tblptr, $1)))
                         		emit2(fload, place);
 		}
+		printf("id exit\n");
 	 }
         | expr OR  expr { emit(ior); }
         | expr AN  expr { emit(iand); }
@@ -608,21 +631,19 @@ expr    : ID   '=' expr {
         | expr GE  expr { emit3(if_icmpge,8); emit2(bipush,0); emit3(goto_,5); emit2(bipush,1); }
         | expr LS  expr { emit(ishl); }
         | expr RS  expr { emit(ishr); }
-        | expr '+' expr 
-	 { 
-/*
-		if (iseq($1.type, $3.type))
-		{
-			if (isint($1.type))
+        | expr '+' expr {	 
+		//if (iseq($1->type, $3->type))
+		//{
+
+			//if (isint($1->type))
 			    emit(iadd);
-			else
-			    emit(fadd);
-		}
-		else
-		{
-			error("Type error");
-		}
-*/
+			//else
+			  //  emit(fadd);
+		//}
+		//else
+	//	{
+	//	}
+
 		//$$.type = $1.type;
 	   }
         | expr '-' expr { emit(isub); }
@@ -646,7 +667,8 @@ expr    : ID   '=' expr {
         | '(' expr ')'
         | '$' INT8      { // check that we are in main()
 			  if (is_in_main)
-			  {	emit(aload_1);
+			  {	
+			    emit(aload_1);
 			  	emit2(bipush, $2);
 			  	emit(iaload);
 			  }
@@ -657,25 +679,21 @@ expr    : ID   '=' expr {
         | NN ID         { emit2(iload, $2->localvar); emit2(bipush, 1); emit(isub); emit(dup); emit2(istore, $2->localvar); } 
         | ID PP         { emit2(iload, $1->localvar); emit(dup); emit2(bipush, 1); emit(iadd); emit2(istore, $1->localvar); }
         | ID NN         {  emit2(iload, $1->localvar); emit(dup); emit2(bipush, 1); emit(isub); emit2(istore, $1->localvar); }
-        | ID            {  emit2(iload, $1->localvar); }
-        | INT8          { emit2(bipush, $1); }
-        | INT16         { emit3(sipush, $1); }
-        | INT32         { emit2(ldc, constant_pool_add_Integer(&cf, $1)); }
+        | INT8          { printf("INT8 = %d\n", $1); emit2(bipush, $1); }
+        | INT16         { printf("INT16\n"); emit3(sipush, $1); }
+        | INT32         { printf("INT32\n"); emit2(ldc, constant_pool_add_Integer(&cf, $1)); }
 	 | FLT		{ error("float constant not supported"); }
 	 | STR		{ /* We do not need to implement strings: */
 			  error("string constant not supported");
 			}
 	 | ID '(' exprs ')'
 			{
-			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
+			  printf("ID ( exprs ), cf.name=%s, %s %s\n",cf.name, $1->lexptr, gettype(top_tblptr, $1));
+			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, /*gettype(top_tblptr, $1)*/ "(I)I"));
+			  printf("exit ID ( exprs )\n");
 
 			  //$$.type = mkret(gettype(top_tblptr, $1));
 			}
-	 | ID '(' args ')'
-		{ /* TASK 3: TO BE COMPLETED */
-			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
-			  //error("function call not implemented");
-		}
         ;
 
 K       : /* empty */   { $$ = pc; emit3(ifne, 0); }

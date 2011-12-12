@@ -1,7 +1,7 @@
 // test functions
 int fac(int n)
 { 
-  return 1;
+  return n;
 }
 main()
 { return fac($0);

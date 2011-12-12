@@ -41,17 +41,25 @@ Type mkret(Type type)
 }
 
 int isvoid(Type type)
-{ return type && !strcmp(type, "V");
+{ 
+printf("isvoid\n");
+return type && !strcmp(type, "V");
 }
 
 int isint(Type type)
-{ return type && !strcmp(type, "I");
+{
+printf("isint\n");
+ return type && !strcmp(type, "I");
 }
 
 int isfloat(Type type)
-{ return type && !strcmp(type, "F");
+{ 
+printf("isfloat\n");
+return type && !strcmp(type, "F");
 }
 
 int iseq(Type type1, Type type2)
-{ return type1 && type2 && !strcmp(type1, type2);
+{ 
+printf("isseq\n");
+return type1 && type2 && !strcmp(type1, type2);
 }

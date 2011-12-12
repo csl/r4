@@ -86,7 +86,6 @@ SP 		[ \t\r\n]
 static int install_id()
 {
 	yylval.sym = lookup(yytext);
-
 	if (!yylval.sym)
 	{
 		yylval.sym = insert(yytext, ID);
