@@ -35,6 +35,18 @@ struct Table
 
 typedef struct Table Table;
 
+typedef char* Backpatchlist;
+
+struct Expr
+{
+	Backpatchlist *truelist;
+	Backpatchlist *falselist;
+	Type type;
+};
+
+typedef struct Expr Expr;
+
+
 extern Symbol *lookup(char*);
 extern Symbol *insert(char*, int);
 
@@ -88,3 +100,7 @@ extern FILE *yyin;
 extern int yylineno;
 
 extern int errnum;
+
+extern Backpatchlist* makelist(int location);
+void backpathlist(Backpatchlist *list, int location);
+Backpatchlist* mergelist(Backpatchlist *list1, Backpatchlist *list2);

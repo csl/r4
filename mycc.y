@@ -30,15 +30,6 @@ static char buffer[255];
 
 /* flag to indicate we are compiling main's body (to differentiate 'return') */
 static int is_in_main = 0;
-/*
-struct Expr
-{
-	Backpatchlist *truelist;
-	Backpatchlist *falselist;
-};
-
-typedef struct Expr Expr;
-*/
 %}
 
 /* declare YYSTYPE attribute types of tokens and nonterminals */
@@ -49,7 +40,7 @@ typedef struct Expr Expr;
   char *str;    /* token value yylval.str is the value of a string constant */
   unsigned loc; /* location of instruction to backpatch */
   Type typ;	/* type descriptor */
-  /*Expr exp;*/
+  Expr exp;
 };
 
 /* declare ID token and its attribute type */
@@ -87,6 +78,8 @@ typedef struct Expr Expr;
 %type <loc> K L M N
 
 %type <typ> type list args
+
+%type <exp> expr
 
 %%
 
@@ -151,17 +144,18 @@ func	: MAIN '(' ')' Mmain block
 			  enterproc(top_tblptr, $1, type, table);
 			  printf("main func exit\n");
 			}
-	| type ID '(' Margs args ')' block
+	| ftype Margs args ')' block
 	{  /* TASK 3: TO BE COMPLETED */
-			  Table *table;
+		Table *table;
               // the type of function is a JVM type descriptor
-              Type type = mkfun($5, $1);
+              //Type type = mkfun($5, $1);
+		Type type = mkfun($3, return_type);
 
               // method has public access and is static
               cf.methods[cf.method_count].access = ACC_PUBLIC | ACC_STATIC;
 
               // method name is ID
-              cf.methods[cf.method_count].name = $2->lexptr;
+              cf.methods[cf.method_count].name = $1->lexptr;
               cf.methods[cf.method_count].descriptor = type;
               cf.methods[cf.method_count].code_length = pc;
 
@@ -185,15 +179,8 @@ func	: MAIN '(' ')' Mmain block
               pop_tblptr;
               pop_offset;
 
-              enterproc(top_tblptr, $2->lexptr, type, table);
-			  printf("func exit\n");
+              enterproc(top_tblptr, $1->lexptr, type, table);
 	    }
-/*
-	   | ftype Margs args ')' block
-	    {
-		Type type = mkfun($3, return_type);
-             }
-*/
 	;
 
 Mmain	:		{ int label1, label2;
@@ -247,15 +234,14 @@ Margs	:		{ /* TASK 3: TO BE COMPLETED */
 			  printf("margs exit\n");
 	    		}
 	;
-/*
-ftype	:	type ID '('
-			{
-				return_type = $1;
-				$$ = $2;	
-			}
+
+ftype	: type ID '('
+	{
+		return_type = $1;
+		$$ = $2;	
+	}
 
 	;
-*/
 block	: '{' decls stmts '}'
 {
 	printf("block exit\n");
@@ -350,18 +336,14 @@ stmt    : ';'
         | RETURN expr ';'
                         { 
 
-				if (is_in_main)
+			    if (is_in_main)
 			  		emit(istore_2);
-			    else 
-			  		emit(ireturn);
-/*
 			    else if (isint(return_type) && isint($2.type))
 			  	emit(ireturn);
 			    else if (isint(return_type) && isint($2.type))
 			  	emit(freturn);
 			    else
 			  	error("Type error");
-*/
 			}
 	 		| BREAK ';'	{ /* BREAK is optional to implement */
 			  error("break not implemented");
@@ -384,8 +366,8 @@ expr    : ID   '=' expr {
 
 				    if (isint(gettype(top_tblptr, $1)))
 				    {
-					//if (isfloat($3.type)
-					//	emit2(f2i); 
+					if (isfloat($3.type)
+						emit2(f2i); 
 					if (getlevel(top_tblptr, $1) == 0) 
 						emit3(putstatic, place); 
 					else
@@ -393,8 +375,8 @@ expr    : ID   '=' expr {
 		                      }
 				    else if (isfloat(gettype(top_tblptr, $1)))
 				    {
-					//if (isint($3.type))
-					//	emit2(i2f); 
+					if (isint($3.type))
+						emit2(i2f); 
 					if (getlevel(top_tblptr, $1) == 0) 
 						emit3(putstatic, place); 
 					else
@@ -404,7 +386,8 @@ expr    : ID   '=' expr {
 				    }
 				   else 
 					error("Type error");
-			    //$$.type = $3.type;
+			    
+				$$.type = $3.type;
 
 	 }
         | ID   PA  expr { 
@@ -722,19 +705,20 @@ expr    : ID   '=' expr {
         | expr LS  expr { emit(ishl); }
         | expr RS  expr { emit(ishr); }
         | expr '+' expr {	 
-		//if (iseq($1->type, $3->type))
-		//{
+		if (iseq($1->type, $3->type))
+		{
 
-			//if (isint($1->type))
+			if (isint($1->type))
 			    emit(iadd);
-			//else
-			  //  emit(fadd);
-		//}
-		//else
-	//	{
-	//	}
+			else
+			    emit(fadd);
+		}
+		else
+		{
+			error("Type error");
+		}
 
-		//$$.type = $1.type;
+		$$.type = $1.type;
 	   }
         | expr '-' expr { emit(isub); }
         | expr '*' expr { emit(imul); }
@@ -782,7 +766,7 @@ expr    : ID   '=' expr {
 			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, /*gettype(top_tblptr, $1)*/ "(I)I"));
 			  printf("exit ID ( exprs )\n");
 
-			  //$$.type = mkret(gettype(top_tblptr, $1));
+			  $$.type = mkret(gettype(top_tblptr, $1));
 			}
         ;
 
