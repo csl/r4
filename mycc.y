@@ -17,8 +17,7 @@ static int tblsp = -1;
 static int offsp = -1;
 
 static Type return_type;
-
-static char buffer[255];	
+static Table *oldaddr;
 
 /* stack operations */
 #define top_tblptr	(tblptr[tblsp])
@@ -53,8 +52,6 @@ static int is_in_main = 0;
 
 %token <str> STR
 
-//%token <exp> expr
-
 /* declare tokens for keywords */
 /* Note: install_id() returns Symbol* for keywords and identifiers */
 %token <sym> DO ELSE FLOAT FOR IF INT MAIN RETURN VOID WHILE BREAK
@@ -81,6 +78,8 @@ static int is_in_main = 0;
 
 %type <exp> expr
 
+%type <sym> ftype
+
 %%
 
 prog	: Mprog exts	{ addwidth(top_tblptr, top_offset);
@@ -103,7 +102,6 @@ exts	: exts func
 
 func	: MAIN '(' ')' Mmain block
 			{ // need a temporary table pointer
-			  printf("main func\n");
 			  Table *table;
 			  // the type of main is a JVM type descriptor
 			  Type type = mkfun("[Ljava/lang/String;", "V");
@@ -173,7 +171,9 @@ func	: MAIN '(' ')' Mmain block
               if (cf.method_count > MAXFUN)
                 error("Max number of functions exceeded");
 
+			  oldaddr=top_tblptr;
               table = top_tblptr;
+			  printf("get %x\n", table);
               addwidth(table, top_offset);
 
               pop_tblptr;
@@ -188,6 +188,7 @@ Mmain	:		{ int label1, label2;
 			  Table *table;
 			  // create new table for local scope of main()
 			  table = mktable(top_tblptr);
+			  printf("Mmain: create new table = %x\n", table);
 			  // push it to create new scope
 			  push_tblptr(table);
 			  // for main(), we must start with offset 3 in the local variables of the frame
@@ -219,32 +220,23 @@ Mmain	:		{ int label1, label2;
 			  backpatch(label2, pc - label2);
 			  // global flag to indicate we're in main()
 			  is_in_main = 1;
-			  printf("Mmain exit\n");
 			}
 	;
 
 //first
-Margs	:		{ /* TASK 3: TO BE COMPLETED */
-			  Table *table = mktable(top_tblptr);
+Margs	:	{ /* TASK 3: TO BE COMPLETED */
+
+			  Table *table = mktable(tblptr);
+			  printf("Margs: create new table = %x\n", table);
 			  push_tblptr(table);
               push_offset(0);
-
 			  init_code();
 			  is_in_main = 0;
-			  printf("margs exit\n");
-	    		}
+	    	}
 	;
 
-ftype	: type ID '('
-	{
-		return_type = $1;
-		$$ = $2;	
-	}
-
-	;
 block	: '{' decls stmts '}'
 {
-	printf("block exit\n");
 }
 
 	;
@@ -316,11 +308,26 @@ stmts   : stmts stmt
 stmt    : ';'
         | expr ';'  { emit(pop); /* does not leave a value on the stack */ }
 	 
-        | IF '(' expr M ')' stmt N L else_stmt L
+ /*       | IF '(' expr M ')' stmt N L else_stmt L
                         //{ backpatch($4, $9 - $4); 
 	            //backpatch($7, $11 - $7);   }        
      		  {   backpatch($4, $8 - $4); 
                     backpatch($7, $10 - $7); }
+*/
+		| IF '(' expr M ')' L stmt 
+		{
+			if ($3.truelist == NULL && $3.falselist == NULL)
+			{
+				error("null: invalid");
+			}
+			else
+			{
+				backpatchlist($3.truelist, $6);
+				backpatchlist($3.falselist, pc);
+			}
+
+		}
+
         | WHILE '(' L expr M ')' stmt N L
                           { backpatch($5, $9 - $5); 
         	                 backpatch($8, $3 - $8); }
@@ -338,12 +345,15 @@ stmt    : ';'
 
 			    if (is_in_main)
 			  		emit(istore_2);
-			    else if (isint(return_type) && isint($2.type))
-			  	emit(ireturn);
-			    else if (isint(return_type) && isint($2.type))
-			  	emit(freturn);
+			    else if (isint(return_type) /*&& isint($2.type)*/)
+			  		emit(ireturn);
+			    else if (isfloat(return_type) /*&& isfloat($2.type)*/)
+			  		emit(freturn);
 			    else
-			  	error("Type error");
+				{
+			  		printf("%s, %s, Type error\n", return_type, $2.type);
+					error("Type Error");
+				}
 			}
 	 		| BREAK ';'	{ /* BREAK is optional to implement */
 			  error("break not implemented");
@@ -366,8 +376,8 @@ expr    : ID   '=' expr {
 
 				    if (isint(gettype(top_tblptr, $1)))
 				    {
-					if (isfloat($3.type)
-						emit2(f2i); 
+	//				if (isfloat($3.type)
+	//					emit2(f2i); 
 					if (getlevel(top_tblptr, $1) == 0) 
 						emit3(putstatic, place); 
 					else
@@ -375,8 +385,8 @@ expr    : ID   '=' expr {
 		                      }
 				    else if (isfloat(gettype(top_tblptr, $1)))
 				    {
-					if (isint($3.type))
-						emit2(i2f); 
+	//				if (isint($3.type))
+	//					emit2(i2f); 
 					if (getlevel(top_tblptr, $1) == 0) 
 						emit3(putstatic, place); 
 					else
@@ -385,7 +395,7 @@ expr    : ID   '=' expr {
 					emit2(fstore, place); 
 				    }
 				   else 
-					error("Type error");
+					error("id = expr, Type error");
 			    
 				$$.type = $3.type;
 
@@ -420,6 +430,9 @@ expr    : ID   '=' expr {
 		  {
 			emit3(putstatic, place); 
 		  }
+
+        $$.type = $3.type;
+
 	 }
         | ID   NA  expr { 
 			//emit2(iload, $1->localvar); 
@@ -432,9 +445,9 @@ expr    : ID   '=' expr {
                      emit2(fload, place);
               }
 	    else
-              {
+        {
 			emit3(getstatic, place); 
-              }
+        }
 			emit(swap); emit(isub); emit(dup); 
 			//emit2(istore, $1->localvar);  
             if (getlevel(top_tblptr, $1) == 1) {
@@ -705,17 +718,16 @@ expr    : ID   '=' expr {
         | expr LS  expr { emit(ishl); }
         | expr RS  expr { emit(ishr); }
         | expr '+' expr {	 
-		if (iseq($1->type, $3->type))
+		if (iseq($1.type, $3.type))
 		{
-
-			if (isint($1->type))
+			if (isint($1.type))
 			    emit(iadd);
 			else
 			    emit(fadd);
 		}
 		else
 		{
-			error("Type error");
+			error(" expr + expr: Type error");
 		}
 
 		$$.type = $1.type;
@@ -725,13 +737,12 @@ expr    : ID   '=' expr {
         | expr '/' expr { emit(idiv); }
         | expr '%' expr { emit(irem); }
 	 | expr '%' expr { emit(irem); }
-/*
 	 | expr AN L expr { 
 	 	backpatchlist($1.truelist, $3);
 	 	$$.truelist = $4.truelist;
-	 	$$.falselist = mergelist($1, $1.falselist, $4.falselist); 
-     	 }
-  */              
+	 	$$.falselist = mergelist($1.falselist, $4.falselist); 
+     }
+              
         | '!' expr      { error("! operator not implemented"); }
         | '~' expr      { error("~ operator not implemented"); }
         | '+' expr %prec '!'
@@ -762,12 +773,13 @@ expr    : ID   '=' expr {
 			}
 	 | ID '(' exprs ')'
 			{
-			  printf("ID ( exprs ), cf.name=%s, %s %s\n",cf.name, $1->lexptr, gettype(top_tblptr, $1));
+			  printf("%x\n", top_tblptr                                                                                                                                                                                             <F4><F4><F4><F4><F4><F4><F4><F4><F4><F4><F4><F4><F4>);
 			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, /*gettype(top_tblptr, $1)*/ "(I)I"));
-			  printf("exit ID ( exprs )\n");
 
 			  $$.type = mkret(gettype(top_tblptr, $1));
 			}
+
+
         ;
 
 K       : /* empty */   { $$ = pc; emit3(ifne, 0); }
@@ -788,7 +800,12 @@ P       : /* empty */   { emit(pop); }
 O	: { emit(pop); }
 	;
 
-
+ftype   : type ID '('
+    {
+        return_type = $1;
+        $$ = $2;
+    }
+    ;
 %%
 
 int main(int argc, char **argv)
