@@ -27,14 +27,14 @@ static int install_str();
 quote	\'
 ditto	\"
 back	\\
-digit           [0-9]
-alpha           [a-zA-Z_]
-id              {alpha}({alpha}|{digit})*
-hex		  [{digit}a-zA-Z]
-exp		  [eE][+-]{digit}+
-int             {digit}+
-ch		  [^\n\'"]
-EN 		  [\r\n]  
+digit    [0-9]
+alpha    [a-zA-Z_]
+id       {alpha}({alpha}|{digit})*
+hex		 [{digit}a-zA-Z]
+exp		 [eE][+-]{digit}+
+int      {digit}+
+ch		 [^\n\'"]
+EN 		 [\r\n]  
 SP 		[ \t\r\n]
 
 %%
@@ -45,12 +45,12 @@ SP 		[ \t\r\n]
 <COMMENTS>"*/"{SP}*       { BEGIN INITIAL; }  
 <COMMENTS>.|{SP}     
 "/*"             		  { BEGIN COMMENTS; }  
-{id}                           { return install_id(); }
-{int}                          { return install_int(); }
-0({digit})+                    {  return install_oct(); }
-0(x|X).*{hex}+                   {  return install_hex(); }
-{quote}({back}{ch}|{back}{back}|{back}{quote}|{back}{ditto}|{ch}|{ditto})*{quote}                        {  return install_chr(); }
-{digit}*.{digit}*({exp})       {  return install_fp(); }
+{id}                      { return install_id(); }
+{digit}*\.{digit}+  	  	  {  return install_fp(); }
+{int}                     { return install_int(); }
+0({digit})+               {  return install_oct(); }
+0(x|X).*{hex}+            {  return install_hex(); }
+{quote}({back}{ch}|{back}{back}|{back}{quote}|{back}{ditto}|{ch}|{ditto})*{quote}                        			{  return install_chr(); }
 {ditto}({back}{ch}|{back}{back}|{back}{quote}|{back}{ditto}|{ch}|{quote})*{ditto} {  return install_str(); }
 "+="                           { return PA; }
 "-="                           { return NA; }

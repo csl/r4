@@ -1,12 +1,10 @@
 // test functions
-int counter;
-int add(int val)
-{
-	return counter += val;
-}
-
 main()
 { 
-	add(2);
-	return add(-1);
+  int fac, n;
+  n = $0;
+  fac = 1;
+  while (n > 0)
+    fac *= n--;
+  return fac; 
 }

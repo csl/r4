@@ -102,6 +102,8 @@ exts	: exts func
 
 func	: MAIN '(' ')' Mmain block
 			{ // need a temporary table pointer
+
+			  printf("Mmain\n");
 			  Table *table;
 			  // the type of main is a JVM type descriptor
 			  Type type = mkfun("[Ljava/lang/String;", "V");
@@ -133,8 +135,9 @@ func	: MAIN '(' ')' Mmain block
 			  if (cf.method_count > MAXFUN)
 			  	error("Max number of functions exceeded");
 			  // add width information to table
+			  addwidth(top_tblptr, top_offset);
 			  table = top_tblptr;
-			  addwidth(table, top_offset);
+			  dumptable(table);
 			  // exit the local scope by popping
 			  pop_tblptr;
 			  pop_offset;
@@ -170,16 +173,15 @@ func	: MAIN '(' ')' Mmain block
               cf.method_count++;
               if (cf.method_count > MAXFUN)
                 error("Max number of functions exceeded");
-
-			  oldaddr=top_tblptr;
+				
               table = top_tblptr;
-			  printf("get %x\n", table);
               addwidth(table, top_offset);
 
               pop_tblptr;
               pop_offset;
 
-              enterproc(top_tblptr, $1->lexptr, type, table);
+              enterproc(top_tblptr, $1, type, table);
+			  dumptable(table);
 	    }
 	;
 
@@ -226,10 +228,11 @@ Mmain	:		{ int label1, label2;
 //first
 Margs	:	{ /* TASK 3: TO BE COMPLETED */
 
-			  Table *table = mktable(tblptr);
+			  Table *table = mktable(top_tblptr);
 			  printf("Margs: create new table = %x\n", table);
 			  push_tblptr(table);
               push_offset(0);
+
 			  init_code();
 			  is_in_main = 0;
 	    	}
@@ -308,12 +311,14 @@ stmts   : stmts stmt
 stmt    : ';'
         | expr ';'  { emit(pop); /* does not leave a value on the stack */ }
 	 
- /*       | IF '(' expr M ')' stmt N L else_stmt L
+        | IF '(' expr M ')' stmt N L else_stmt L
                         //{ backpatch($4, $9 - $4); 
 	            //backpatch($7, $11 - $7);   }        
      		  {   backpatch($4, $8 - $4); 
                     backpatch($7, $10 - $7); }
-*/
+
+
+/*
 		| IF '(' expr M ')' L stmt 
 		{
 			if ($3.truelist == NULL && $3.falselist == NULL)
@@ -326,7 +331,7 @@ stmt    : ';'
 				backpatchlist($3.falselist, pc);
 			}
 
-		}
+		}*/
 
         | WHILE '(' L expr M ')' stmt N L
                           { backpatch($5, $9 - $5); 
@@ -376,8 +381,8 @@ expr    : ID   '=' expr {
 
 				    if (isint(gettype(top_tblptr, $1)))
 				    {
-	//				if (isfloat($3.type)
-	//					emit2(f2i); 
+					if (isfloat($3.type))
+						emit(i2f); 
 					if (getlevel(top_tblptr, $1) == 0) 
 						emit3(putstatic, place); 
 					else
@@ -385,8 +390,8 @@ expr    : ID   '=' expr {
 		                      }
 				    else if (isfloat(gettype(top_tblptr, $1)))
 				    {
-	//				if (isint($3.type))
-	//					emit2(i2f); 
+						if (isint($3.type))
+						emit(i2f); 
 					if (getlevel(top_tblptr, $1) == 0) 
 						emit3(putstatic, place); 
 					else
@@ -474,7 +479,7 @@ expr    : ID   '=' expr {
             }
 	    else
               {
-			emit3(getstatic, place); 
+				emit3(getstatic, place); 
               }
 
 			emit(imul); emit(dup); 
@@ -760,21 +765,118 @@ expr    : ID   '=' expr {
 			  else
 			  	error("invalid use of $# in function");
 			}
-        | PP ID         { emit2(iload, $2->localvar); emit2(bipush, 1); emit(iadd); emit(dup); emit2(istore, $2->localvar); }
-        | NN ID         { emit2(iload, $2->localvar); emit2(bipush, 1); emit(isub); emit(dup); emit2(istore, $2->localvar); } 
-        | ID PP         { emit2(iload, $1->localvar); emit(dup); emit2(bipush, 1); emit(iadd); emit2(istore, $1->localvar); }
-        | ID NN         {  emit2(iload, $1->localvar); emit(dup); emit2(bipush, 1); emit(isub); emit2(istore, $1->localvar); }
-        | INT8          { printf("INT8 = %d\n", $1); emit2(bipush, $1); }
-        | INT16         { printf("INT16\n"); emit3(sipush, $1); }
-        | INT32         { printf("INT32\n"); emit2(ldc, constant_pool_add_Integer(&cf, $1)); }
-	 | FLT		{ error("float constant not supported"); }
-	 | STR		{ /* We do not need to implement strings: */
+        | PP ID         { 
+           		int place = getplace(top_tblptr, $2);
+            	if (getlevel(top_tblptr, $2) == 1) {
+                	 place = getplace(top_tblptr, $2);
+                 	if (isint(gettype(top_tblptr, $2)))
+                     	emit2(iload, place);
+                 	else if (isfloat(gettype(top_tblptr, $2)))
+                    	 emit2(fload, place);
+               	}
+        		else 	{
+            		emit3(getstatic, place);
+             	}
+				emit2(bipush, 1); emit(iadd); emit(dup); 
+            	if (getlevel(top_tblptr, $2) == 1) {
+                	place = getplace(top_tblptr, $2);
+                	if (isint(gettype(top_tblptr, $2)))
+                    	emit2(istore, place);
+                	else if (isfloat(gettype(top_tblptr, $2)))
+                    	emit2(fstore, place);
+                }
+        		else
+              	{
+            		emit3(putstatic, place);
+              	}
+        }
+        | NN ID  { 
+                int place = getplace(top_tblptr, $2);
+                if (getlevel(top_tblptr, $2) == 1) {
+                     place = getplace(top_tblptr, $2);
+                    if (isint(gettype(top_tblptr, $2)))
+                        emit2(iload, place);
+                    else if (isfloat(gettype(top_tblptr, $2)))
+                         emit2(fload, place);
+                }
+                else    {
+                    emit3(getstatic, place);
+                }
+            	emit2(bipush, 1); emit(isub); emit(dup);
+                if (getlevel(top_tblptr, $2) == 1) {
+                    place = getplace(top_tblptr, $2);
+                    if (isint(gettype(top_tblptr, $2)))
+                        emit2(istore, place);
+                    else if (isfloat(gettype(top_tblptr, $2)))
+                        emit2(fstore, place);
+                }
+        		else
+              	{
+            		emit3(putstatic, place);
+              	}
+		} 
+        | ID PP   { 
+
+                int place = getplace(top_tblptr, $1);
+                if (getlevel(top_tblptr, $1) == 1) {
+                     place = getplace(top_tblptr, $1);
+                    if (isint(gettype(top_tblptr, $1)))
+                        emit2(iload, place);
+                    else if (isfloat(gettype(top_tblptr, $1)))
+                         emit2(fload, place);
+                }
+                else    {
+                    emit3(getstatic, place);
+                }
+				emit(dup); emit2(bipush, 1); emit(iadd); 
+                if (getlevel(top_tblptr, $1) == 1) {
+                    place = getplace(top_tblptr, $1);
+                    if (isint(gettype(top_tblptr, $1)))
+                        emit2(istore, place);
+                    else if (isfloat(gettype(top_tblptr, $1)))
+                        emit2(fstore, place);
+                }
+        		else
+              	{
+            		emit3(putstatic, place);
+              	}
+			}
+        | ID NN         {  
+
+                int place = getplace(top_tblptr, $1);
+                if (getlevel(top_tblptr, $1) == 1) {
+                     place = getplace(top_tblptr, $1);
+                    if (isint(gettype(top_tblptr, $1)))
+                        emit2(iload, place);
+                    else if (isfloat(gettype(top_tblptr, $1)))
+                        emit2(fstore, place);
+				}
+                else    {
+                    emit3(getstatic, place);
+                }
+				emit(dup); emit2(bipush, 1); emit(isub); 
+                if (getlevel(top_tblptr, $1) == 1) {
+                    place = getplace(top_tblptr, $1);
+                    if (isint(gettype(top_tblptr, $1)))
+                        emit2(istore, place);
+                    else if (isfloat(gettype(top_tblptr, $1)))
+                        emit2(fstore, place);
+                }
+                else
+                {
+                    emit3(putstatic, place);
+                }
+		}
+        | INT8          { emit2(bipush, $1); }
+        | INT16         { emit3(sipush, $1); }
+        | INT32         { emit2(ldc, constant_pool_add_Integer(&cf, $1)); }
+	 	| FLT		{ emit2(ldc, constant_pool_add_Float(&cf, $1)); }
+	 	| STR		{ /* We do not need to implement strings: */
 			  error("string constant not supported");
 			}
 	 | ID '(' exprs ')'
 			{
-			  printf("%x\n", top_tblptr                                                                                                                                                                                             <F4><F4><F4><F4><F4><F4><F4><F4><F4><F4><F4><F4><F4>);
-			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, /*gettype(top_tblptr, $1)*/ "(I)I"));
+			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
 
 			  $$.type = mkret(gettype(top_tblptr, $1));
 			}

@@ -39,7 +39,7 @@
 
   24  stmt : ';'
   25       | expr ';'
-  26       | IF '(' expr M ')' L stmt
+  26       | IF '(' expr M ')' stmt N L else_stmt L
   27       | WHILE '(' L expr M ')' stmt N L
   28       | DO L stmt WHILE '(' expr M N L ')' ';'
   29       | FOR '(' expr O ';' L expr M N ';' L expr O N ')' L stmt
@@ -567,7 +567,7 @@ state 45
 
 
 state 46
-	stmt : IF . '(' expr M ')' L stmt  (26)
+	stmt : IF . '(' expr M ')' stmt N L else_stmt L  (26)
 
 	'('  shift 80
 	.  error
@@ -1150,7 +1150,7 @@ state 79
 
 
 state 80
-	stmt : IF '(' . expr M ')' L stmt  (26)
+	stmt : IF '(' . expr M ')' stmt N L else_stmt L  (26)
 
 	ID  shift 38
 	INT8  shift 39
@@ -2466,7 +2466,7 @@ state 126
 
 
 state 127
-	stmt : IF '(' expr . M ')' L stmt  (26)
+	stmt : IF '(' expr . M ')' stmt N L else_stmt L  (26)
 	expr : expr . OR expr  (48)
 	expr : expr . AN expr  (49)
 	expr : expr . '|' expr  (50)
@@ -3407,7 +3407,7 @@ state 154
 
 
 state 155
-	stmt : IF '(' expr M . ')' L stmt  (26)
+	stmt : IF '(' expr M . ')' stmt N L else_stmt L  (26)
 
 	')'  shift 161
 	.  error
@@ -3583,12 +3583,35 @@ state 160
 
 
 state 161
-	stmt : IF '(' expr M ')' . L stmt  (26)
-	L : .  (85)
+	stmt : IF '(' expr M ')' . stmt N L else_stmt L  (26)
 
-	.  reduce 85
+	error  shift 37
+	ID  shift 38
+	INT8  shift 39
+	INT16  shift 40
+	INT32  shift 41
+	FLT  shift 42
+	STR  shift 43
+	DO  shift 44
+	FOR  shift 45
+	IF  shift 46
+	RETURN  shift 47
+	WHILE  shift 48
+	BREAK  shift 49
+	'+'  shift 50
+	'-'  shift 51
+	'!'  shift 52
+	'~'  shift 53
+	PP  shift 54
+	NN  shift 55
+	'('  shift 56
+	'{'  shift 57
+	';'  shift 59
+	'$'  shift 60
+	.  error
 
-	L  goto 165
+	expr  goto 61
+	stmt  goto 165
 
 
 state 162
@@ -3668,35 +3691,12 @@ state 164
 
 
 state 165
-	stmt : IF '(' expr M ')' L . stmt  (26)
+	stmt : IF '(' expr M ')' stmt . N L else_stmt L  (26)
+	N : .  (87)
 
-	error  shift 37
-	ID  shift 38
-	INT8  shift 39
-	INT16  shift 40
-	INT32  shift 41
-	FLT  shift 42
-	STR  shift 43
-	DO  shift 44
-	FOR  shift 45
-	IF  shift 46
-	RETURN  shift 47
-	WHILE  shift 48
-	BREAK  shift 49
-	'+'  shift 50
-	'-'  shift 51
-	'!'  shift 52
-	'~'  shift 53
-	PP  shift 54
-	NN  shift 55
-	'('  shift 56
-	'{'  shift 57
-	';'  shift 59
-	'$'  shift 60
-	.  error
+	.  reduce 87
 
-	expr  goto 61
-	stmt  goto 169
+	N  goto 169
 
 
 state 166
@@ -3788,9 +3788,12 @@ state 168
 
 
 state 169
-	stmt : IF '(' expr M ')' L stmt .  (26)
+	stmt : IF '(' expr M ')' stmt N . L else_stmt L  (26)
+	L : .  (85)
 
-	.  reduce 26
+	.  reduce 85
+
+	L  goto 173
 
 
 state 170
@@ -3799,7 +3802,7 @@ state 170
 
 	.  reduce 87
 
-	N  goto 173
+	N  goto 174
 
 
 state 171
@@ -3808,7 +3811,7 @@ state 171
 
 	.  reduce 85
 
-	L  goto 174
+	L  goto 175
 
 
 state 172
@@ -3817,61 +3820,123 @@ state 172
 
 	.  reduce 87
 
-	N  goto 175
+	N  goto 176
 
 
 state 173
+	stmt : IF '(' expr M ')' stmt N L . else_stmt L  (26)
+
+	ELSE  shift 177
+	.  error
+
+	else_stmt  goto 178
+
+
+state 174
 	stmt : WHILE '(' L expr M ')' stmt N . L  (27)
 	L : .  (85)
 
 	.  reduce 85
 
-	L  goto 176
-
-
-state 174
-	stmt : DO L stmt WHILE '(' expr M N L . ')' ';'  (28)
-
-	')'  shift 177
-	.  error
+	L  goto 179
 
 
 state 175
-	stmt : FOR '(' expr O ';' L expr M N . ';' L expr O N ')' L stmt  (29)
+	stmt : DO L stmt WHILE '(' expr M N L . ')' ';'  (28)
 
-	';'  shift 178
+	')'  shift 180
 	.  error
 
 
 state 176
+	stmt : FOR '(' expr O ';' L expr M N . ';' L expr O N ')' L stmt  (29)
+
+	';'  shift 181
+	.  error
+
+
+state 177
+	else_stmt : ELSE . stmt  (3)
+
+	error  shift 37
+	ID  shift 38
+	INT8  shift 39
+	INT16  shift 40
+	INT32  shift 41
+	FLT  shift 42
+	STR  shift 43
+	DO  shift 44
+	FOR  shift 45
+	IF  shift 46
+	RETURN  shift 47
+	WHILE  shift 48
+	BREAK  shift 49
+	'+'  shift 50
+	'-'  shift 51
+	'!'  shift 52
+	'~'  shift 53
+	PP  shift 54
+	NN  shift 55
+	'('  shift 56
+	'{'  shift 57
+	';'  shift 59
+	'$'  shift 60
+	.  error
+
+	expr  goto 61
+	stmt  goto 182
+
+
+state 178
+	stmt : IF '(' expr M ')' stmt N L else_stmt . L  (26)
+	L : .  (85)
+
+	.  reduce 85
+
+	L  goto 183
+
+
+state 179
 	stmt : WHILE '(' L expr M ')' stmt N L .  (27)
 
 	.  reduce 27
 
 
-state 177
+state 180
 	stmt : DO L stmt WHILE '(' expr M N L ')' . ';'  (28)
 
-	';'  shift 179
+	';'  shift 184
 	.  error
 
 
-state 178
+state 181
 	stmt : FOR '(' expr O ';' L expr M N ';' . L expr O N ')' L stmt  (29)
 	L : .  (85)
 
 	.  reduce 85
 
-	L  goto 180
+	L  goto 185
 
 
-state 179
+state 182
+	else_stmt : ELSE stmt .  (3)
+
+	.  reduce 3
+
+
+state 183
+	stmt : IF '(' expr M ')' stmt N L else_stmt L .  (26)
+
+	.  reduce 26
+
+
+state 184
 	stmt : DO L stmt WHILE '(' expr M N L ')' ';' .  (28)
 
 	.  reduce 28
 
 
-state 180
+state 185
 	stmt : FOR '(' expr O ';' L expr M N ';' L . expr O N ')' L stmt  (29)
 
 	ID  shift 38
@@ -3890,10 +3955,10 @@ state 180
 	'$'  shift 60
 	.  error
 
-	expr  goto 181
+	expr  goto 186
 
 
-state 181
+state 186
 	stmt : FOR '(' expr O ';' L expr M N ';' L expr . O N ')' L stmt  (29)
 	expr : expr . OR expr  (48)
 	expr : expr . AN expr  (49)
@@ -3937,35 +4002,35 @@ state 181
 	'%'  shift 110
 	')'  reduce 89
 
-	O  goto 182
+	O  goto 187
 
 
-state 182
+state 187
 	stmt : FOR '(' expr O ';' L expr M N ';' L expr O . N ')' L stmt  (29)
 	N : .  (87)
 
 	.  reduce 87
 
-	N  goto 183
+	N  goto 188
 
 
-state 183
+state 188
 	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N . ')' L stmt  (29)
 
-	')'  shift 184
+	')'  shift 189
 	.  error
 
 
-state 184
+state 189
 	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N ')' . L stmt  (29)
 	L : .  (85)
 
 	.  reduce 85
 
-	L  goto 185
+	L  goto 190
 
 
-state 185
+state 190
 	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N ')' L . stmt  (29)
 
 	error  shift 37
@@ -3994,17 +4059,16 @@ state 185
 	.  error
 
 	expr  goto 61
-	stmt  goto 186
+	stmt  goto 191
 
 
-state 186
+state 191
 	stmt : FOR '(' expr O ';' L expr M N ';' L expr O N ')' L stmt .  (29)
 
 	.  reduce 29
 
 
 Rules never reduced:
-	else_stmt : ELSE stmt  (3)
 	expr : expr '%' expr  (66)
 	K :  (84)
 	P :  (88)
@@ -4015,4 +4079,4 @@ State 150 contains 21 reduce/reduce conflicts.
 
 
 61 terminals, 25 nonterminals
-91 grammar rules, 187 states
+91 grammar rules, 192 states

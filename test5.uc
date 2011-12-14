@@ -2,7 +2,7 @@
 main()
 { float p;
   int n, m;
-  p = 1.0;
+  p = 3.2;
   n = $0;
   m = $1;
   while (m > 0)
