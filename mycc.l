@@ -85,6 +85,8 @@ SP 		[ \t\r\n]
 /* install_id - add identifier to symbol table if not already there and assign it a JVM local var index */
 static int install_id()
 {
+
+	printf("%s\n", yytext);
 	yylval.sym = lookup(yytext);
 	if (!yylval.sym)
 	{
@@ -125,13 +127,16 @@ static int install_oct()
 /* install_hex - convert hexadecimal yytext[] to yylval.num and return INT8, INT16, or INT32 */
 static int install_hex()
 {
-	sscanf(yytext, "%x", &yylval.num);
+	sscanf(yytext, "%X", &yylval.num);
+
 
 	if (yylval.num < 128)
 		return INT8;
 
 	if (yylval.num < 32368)
 		return INT16;
+
+	printf("%X\n", yylval.num);
 
 	return INT32;
 }

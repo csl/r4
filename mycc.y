@@ -343,11 +343,10 @@ stmt    : ';'
 				backpatch($9, $16 - $9);  
 				emit3(goto_, $11-pc); 
 				backpatch($8, pc - $8);
-			    backpatch($14, $6 - $14); 
-                                  }
+			       backpatch($14, $6 - $14); 
+                            }
         | RETURN expr ';'
-                        { 
-
+                  { 
 			    if (is_in_main)
 			  		emit(istore_2);
 			    else if (isint(return_type) /*&& isint($2.type)*/)
@@ -355,12 +354,12 @@ stmt    : ';'
 			    else if (isfloat(return_type) /*&& isfloat($2.type)*/)
 			  		emit(freturn);
 			    else
-				{
+			     {
 			  		printf("%s, %s, Type error\n", return_type, $2.type);
 					error("Type Error");
-				}
-			}
-	 		| BREAK ';'	{ /* BREAK is optional to implement */
+			      }
+		}
+	 | BREAK ';'	{ /* BREAK is optional to implement */
 			  error("break not implemented");
 			}
         | '{' stmts '}'
@@ -694,6 +693,8 @@ expr    : ID   '=' expr {
 
            }
 	 | ID { 
+
+		printf("ID %s\n", $1->lexptr);
 		int place;
 
 		if (getlevel(top_tblptr, $1) == 0)
@@ -710,7 +711,7 @@ expr    : ID   '=' expr {
 		}
 	 }
         | expr OR  expr { emit(ior); }
-        | expr AN  expr { emit(iand); }
+//        | expr AN  expr { emit(iand); }
         | expr '|' expr { emit(ior); }
         | expr '^' expr { emit(ixor); }
         | expr '&' expr { emit(iand); }
@@ -723,30 +724,32 @@ expr    : ID   '=' expr {
         | expr LS  expr { emit(ishl); }
         | expr RS  expr { emit(ishr); }
         | expr '+' expr {	 
-		if (iseq($1.type, $3.type))
+		//if (iseq($1.type, $3.type))
 		{
 			if (isint($1.type))
 			    emit(iadd);
 			else
 			    emit(fadd);
 		}
-		else
-		{
-			error(" expr + expr: Type error");
-		}
+		//else
+		//{
+		//	error(" expr + expr: Type error");
+		//}
 
 		$$.type = $1.type;
 	   }
         | expr '-' expr { emit(isub); }
         | expr '*' expr { emit(imul); }
         | expr '/' expr { emit(idiv); }
-        | expr '%' expr { emit(irem); }
-	 | expr '%' expr { emit(irem); }
+        | expr '%' expr { 
+			emit(irem);
+			$$.type = $1.type;
+	}
 	 | expr AN L expr { 
 	 	backpatchlist($1.truelist, $3);
 	 	$$.truelist = $4.truelist;
 	 	$$.falselist = mergelist($1.falselist, $4.falselist); 
-     }
+          }
               
         | '!' expr      { error("! operator not implemented"); }
         | '~' expr      { error("~ operator not implemented"); }
@@ -777,7 +780,9 @@ expr    : ID   '=' expr {
         		else 	{
             		emit3(getstatic, place);
              	}
-				emit2(bipush, 1); emit(iadd); emit(dup); 
+
+	       emit2(bipush, 1); emit(iadd); emit(dup); 
+
             	if (getlevel(top_tblptr, $2) == 1) {
                 	place = getplace(top_tblptr, $2);
                 	if (isint(gettype(top_tblptr, $2)))
@@ -870,16 +875,21 @@ expr    : ID   '=' expr {
         | INT8          { emit2(bipush, $1); }
         | INT16         { emit3(sipush, $1); }
         | INT32         { emit2(ldc, constant_pool_add_Integer(&cf, $1)); }
-	 	| FLT		{ emit2(ldc, constant_pool_add_Float(&cf, $1)); }
-	 	| STR		{ /* We do not need to implement strings: */
+	 | FLT		{ emit2(ldc, constant_pool_add_Float(&cf, $1)); }
+	 | STR		{ /* We do not need to implement strings: */
 			  error("string constant not supported");
 			}
 	 | ID '(' exprs ')'
 			{
 			  emit3(invokestatic, constant_pool_add_Methodref(&cf, cf.name, $1->lexptr, gettype(top_tblptr, $1)));
 
+                    if (isint(gettype(top_tblptr, $1)))
+			  $$.type = mkint(gettype(top_tblptr, $1));
+                    else if (isfloat(gettype(top_tblptr, $1)))
+			  $$.type = mkfloat(gettype(top_tblptr, $1));
+		     else
 			  $$.type = mkret(gettype(top_tblptr, $1));
-			}
+		}
 
 
         ;
